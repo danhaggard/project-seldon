@@ -1,21 +1,12 @@
-import { createClient } from "@/utils/supabase/server";
+import { Button } from "@/components/ui/button";
 
-export default async function Home() {
-  const supabase = await createClient();
-
-  // This query will fail if the connection is bad,
-  // or return [] if successful but empty.
-  const { data: todos, error } = await supabase.from("todos").select("*");
-
-  console.log("Supabase connection test:", { todos, error });
-
+export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Supabase Status: {error ? "❌ Error" : "✅ Connected"}
-        </p>
-      </div>
-    </main>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+      <h1 className="text-4xl font-bold">Project Seldon</h1>
+      <Button>Click me</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="outline">Outline</Button>
+    </div>
   );
 }
