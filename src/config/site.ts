@@ -1,57 +1,76 @@
-export type SiteConfig = typeof siteConfig;
+import {
+  Home,
+  TrendingUp,
+  Users,
+  LineChart,
+  Settings,
+  ShieldCheck,
+  CircleUser,
+  LucideIcon,
+} from "lucide-react";
 
-export const siteConfig = {
+export type SiteConfig = {
+  name: string;
+  description: string;
+  nav: {
+    title: string;
+    href: string;
+    icon: LucideIcon; // <--- Store the component itself, not a string
+    protected?: boolean;
+    roles?: string[];
+  }[];
+  protectedPaths: (this: SiteConfig) => string[];
+};
+
+export const siteConfig: SiteConfig = {
   name: "Project Seldon",
   description: "Tracking the accuracy of public predictions.",
   nav: [
     {
       title: "Home",
       href: "/",
-      icon: "Home", // We store the icon name as a string to avoid hydration mismatch
+      icon: Home, // Pass the component directly
       protected: false,
     },
     {
       title: "Trending",
       href: "/trending",
-      icon: "TrendingUp",
+      icon: TrendingUp,
       protected: false,
     },
     {
       title: "Gurus",
       href: "/gurus",
-      icon: "Users",
+      icon: Users,
       protected: false,
     },
     {
-      title: "My Predictions", // Only visible to logged-in users
+      title: "My Predictions",
       href: "/protected/predictions",
-      icon: "LineChart",
+      icon: LineChart,
       protected: true,
     },
     {
       title: "Settings",
       href: "/protected/settings",
-      icon: "Settings",
+      icon: Settings,
       protected: true,
-      // Future RBAC hook:
-      // roles: ["admin", "moderator"]
     },
     {
       title: "Admin Panel",
       href: "/admin",
-      icon: "ShieldCheck",
+      icon: ShieldCheck,
       protected: true,
-      roles: ["admin"], // Only admins can see this
+      roles: ["admin"],
     },
     {
       title: "Account",
       href: "/account",
       protected: true,
-      icon: "CircleUser",
+      icon: CircleUser,
     },
   ],
-  // Helper to get just the protected paths for middleware
-  protectedPaths: function () {
+  protectedPaths: function (this: SiteConfig) {
     return this.nav.filter((item) => item.protected).map((item) => item.href);
   },
 };
