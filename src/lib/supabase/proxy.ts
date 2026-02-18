@@ -46,7 +46,7 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const claims = data?.claims;
 
   // Check if route requires auth and redirect to login if required
   const protectedPaths = siteConfig.protectedPaths();
@@ -54,21 +54,24 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (isProtected && !user) {
+  if (isProtected && !claims) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  const userRole = user?.user_metadata?.role || "user";
+  const userRole = (claims?.user_role as string) || "user";
   const requiredRoles = siteConfig.nav.find((item) =>
     request.nextUrl.pathname.startsWith(item.href),
   )?.roles;
 
-  if (requiredRoles && !requiredRoles.includes(userRole)) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/403-forbidden";
-    return NextResponse.redirect(url);
+  if (requiredRoles && requiredRoles.length > 0) {
+    if (!requiredRoles.includes(userRole)) {
+      // If the user is logged in but lacks the role, send them to a 403 or Home
+      const url = request.nextUrl.clone();
+      url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page
+      return NextResponse.redirect(url);
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

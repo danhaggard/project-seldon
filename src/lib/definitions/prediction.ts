@@ -10,4 +10,9 @@ export interface Prediction {
   prediction_date: string; // ISO String
   resolution_date: string | null; // ISO String
   source_url: string | null;
+  description: string | null;
+  gurus?: {
+    slug: string;
+    name?: string;
+  };
 }

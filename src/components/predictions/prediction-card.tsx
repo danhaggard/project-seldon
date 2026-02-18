@@ -11,6 +11,18 @@ import {
 } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+
+function getPredictionSlug(prediction: Prediction) {
+  const guruSlug = prediction.gurus?.slug;
+
+  // Fallback: If for some reason slug is missing, linking to root /predictions might be a safe fallback,
+  // but for now let's assume data integrity is good.
+  const href = guruSlug
+    ? `/gurus/${guruSlug}/predictions/${prediction.id}`
+    : `#`;
+  return href;
+}
 
 export function PredictionCard({ prediction }: { prediction: Prediction }) {
   const isPending = prediction.status === "pending";
@@ -61,9 +73,15 @@ export function PredictionCard({ prediction }: { prediction: Prediction }) {
             </div>
 
             {/* Title */}
-            <h3 className="text-lg font-bold leading-tight text-foreground">
-              {prediction.title}
-            </h3>
+            <Link
+              href={getPredictionSlug(prediction)}
+              scroll={false}
+              className="block group"
+            >
+              <h3 className="text-lg font-bold leading-tight text-foreground">
+                {prediction.title}
+              </h3>
+            </Link>
 
             {/* Details Row */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-2">

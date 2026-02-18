@@ -69,6 +69,8 @@ export async function getPredictionsByGuruSlug(
 
     const { data, error, count } = await query;
 
+    if (error) throw error;
+
     return {
       data: (data || []) as Prediction[],
       count: count || 0,
