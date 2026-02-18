@@ -36,7 +36,7 @@ export default async function GuruDetailPage({
   const tab = (resolvedSearchParams.tab as "pending" | "history") || "pending";
 
   return (
-    <div className="container py-10 space-y-8">
+    <div className="container space-y-8">
       {/* 1. Header Section */}
       {/* If this fails, we show a red error box where the header should be */}
 

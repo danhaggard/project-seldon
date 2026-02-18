@@ -1,3 +1,4 @@
+import { AppRole, ROLES } from "@/lib/definitions/auth";
 import {
   Home,
   TrendingUp,
@@ -17,7 +18,7 @@ export type SiteConfig = {
     href: string;
     icon: LucideIcon; // <--- Store the component itself, not a string
     protected?: boolean;
-    roles?: string[];
+    roles?: AppRole[];
   }[];
   protectedPaths: (this: SiteConfig) => string[];
 };
@@ -61,7 +62,7 @@ export const siteConfig: SiteConfig = {
       href: "/admin",
       icon: ShieldCheck,
       protected: true,
-      roles: ["admin"],
+      roles: [ROLES.ADMIN],
     },
     {
       title: "Account",

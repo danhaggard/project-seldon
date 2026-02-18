@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 
 export function SidebarContent() {
   return (
-    <nav className="flex flex-col gap-2 p-4">
+    <nav className="flex flex-col gap-2 pr-4">
       {siteConfig.nav.map((item) => {
         const Icon = item.icon;
 

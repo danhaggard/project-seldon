@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SidebarContent } from "@/components/layout/sidebar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
@@ -59,6 +64,10 @@ export default function RootLayout({
                       </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="w-64 p-0">
+                      {/* Dialog title for screen readers only */}
+                      <SheetTitle className="sr-only">
+                        Navigation Menu
+                      </SheetTitle>
                       <SidebarContent />
                     </SheetContent>
                   </Sheet>
