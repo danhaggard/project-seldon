@@ -1,5 +1,17 @@
 import * as z from "zod";
 
+import { Database } from "./database.types";
+
+// This extracts "admin" | "moderator" | "user" directly from the DB schema
+export type AppRole = Database["public"]["Enums"]["app_role"];
+
+// Optional: A constant for easy comparison/usage in UI
+export const ROLES: Record<Uppercase<AppRole>, AppRole> = {
+  ADMIN: "admin",
+  MODERATOR: "moderator",
+  USER: "user",
+} as const;
+
 export const ForgotPasswordSchema = z.object({
   email: z.email({ message: "Please enter a valid email." }),
 });

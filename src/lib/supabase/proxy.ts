@@ -2,6 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 import { siteConfig } from "@/config/site";
+import { getHasUserRoles } from "./auth-helpers";
+import { AppRole, ROLES } from "../definitions/auth";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -60,13 +62,16 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const userRole = (claims?.user_role as string) || "user";
-  const requiredRoles = siteConfig.nav.find((item) =>
-    request.nextUrl.pathname.startsWith(item.href),
-  )?.roles;
+  const userRoles = (claims?.user_roles as AppRole[]) || [ROLES.USER];
+  const navItem = siteConfig.nav
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((item) => request.nextUrl.pathname.startsWith(item.href));
+
+  const requiredRoles = navItem?.roles;
 
   if (requiredRoles && requiredRoles.length > 0) {
-    if (!requiredRoles.includes(userRole)) {
+    const hasUserRoles = getHasUserRoles("", requiredRoles, userRoles);
+    if (!hasUserRoles) {
       // If the user is logged in but lacks the role, send them to a 403 or Home
       const url = request.nextUrl.clone();
       url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page

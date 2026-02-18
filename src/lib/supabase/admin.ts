@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "@/lib/database.types"; // Adjust path to your types
+import { Database } from "@/lib/definitions/database.types"; // Adjust path to your types
 
 /**
  * WARNING: This client uses the SERVICE_ROLE_KEY.

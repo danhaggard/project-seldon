@@ -2,13 +2,14 @@ import Link, { LinkProps } from "next/link";
 import { siteConfig } from "@/config/site";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { getUserRole } from "@/lib/supabase/auth-helpers";
+import { getHasUserRoles } from "@/lib/supabase/auth-helpers";
+import { AppRole } from "@/lib/definitions/auth";
 
 interface SmartLinkProps extends LinkProps {
   children: React.ReactNode;
   className?: string;
   isProtected?: boolean;
-  roles?: string[];
+  roles?: AppRole[];
 }
 
 export async function SmartLink({
@@ -43,9 +44,12 @@ export async function SmartLink({
 
   // --- CHECK 2: RBAC (Role Based Access) ---
   if (requiredRoles.length > 0) {
-    const userRole = getUserRole(session?.access_token || "");
+    const hasUserRoles = getHasUserRoles(
+      session?.access_token || "",
+      requiredRoles,
+    );
 
-    if (!requiredRoles.includes(userRole)) {
+    if (!hasUserRoles) {
       return null;
     }
   }
