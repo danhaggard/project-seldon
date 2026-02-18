@@ -8,11 +8,6 @@ export const dynamic = "force-dynamic"; // Ensure we get fresh data
 export default async function GurusListPage() {
   const supabase = await createClient();
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  console.log("sefsfe", session?.access_token);
-
   // Fetch all gurus, ordered by credibility (Highest first)
   const { data: gurus } = await supabase
     .from("gurus")

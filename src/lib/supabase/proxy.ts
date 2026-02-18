@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 import { siteConfig } from "@/config/site";
 import { getHasUserRoles } from "./auth-helpers";
-import { AppRole, ROLES } from "../definitions/auth";
+import { AppRole, APP_ROLE } from "../definitions/auth";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -62,8 +62,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const userRoles = (claims?.user_roles as AppRole[]) || [ROLES.USER];
-  console.log("claims", claims);
+  const userRoles = (claims?.user_roles as AppRole[]) || [APP_ROLE.USER];
   const navItem = siteConfig.nav
     .sort((a, b) => b.href.length - a.href.length)
     .find((item) => request.nextUrl.pathname.startsWith(item.href));
@@ -76,7 +75,7 @@ export async function updateSession(request: NextRequest) {
       // If the user is logged in but lacks the role, send them to a 403 or Home
       const url = request.nextUrl.clone();
       url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page
-      // return NextResponse.redirect(url);
+      return NextResponse.redirect(url);
     }
   }
 

@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { Guru } from "@/lib/definitions/guru";
 import { Prediction } from "@/lib/definitions/prediction";
+import { Category } from "../definitions/category";
+import { PredictionSource } from "../definitions/prediction-source";
 
 /**
  * Fetches a single Guru by their URL slug.
@@ -34,6 +36,12 @@ interface PagedResult<T> {
   count: number;
 }
 
+export type PredictionWithRelations = Prediction & {
+  categories: Pick<Category, "name"> | null;
+  gurus: Pick<Guru, "slug"> | null;
+  prediction_sources: Pick<PredictionSource, "url" | "type">[];
+};
+
 /**
  * Fetches all predictions for a specific Guru by their slug.
  * Uses an inner join to filter by the related Guru table.
@@ -43,7 +51,7 @@ export async function getPredictionsByGuruSlug(
   page: number = 1,
   pageSize: number = 5,
   statusFilter: "pending" | "resolved" = "pending",
-): Promise<PagedResult<Prediction>> {
+): Promise<PagedResult<PredictionWithRelations>> {
   const supabase = await createClient();
 
   // Calculate range for Supabase (0-based index)
@@ -54,7 +62,10 @@ export async function getPredictionsByGuruSlug(
     // Build the query
     let query = supabase
       .from("predictions")
-      .select("*, gurus!inner(slug)", { count: "exact" }) // Request exact count
+      .select(
+        "*, gurus!inner(slug), categories (name), prediction_sources (url, type)",
+        { count: "exact" },
+      ) // Request exact count
       .eq("gurus.slug", slug)
       .range(from, to)
       .order("prediction_date", { ascending: false });
@@ -72,7 +83,7 @@ export async function getPredictionsByGuruSlug(
     if (error) throw error;
 
     return {
-      data: (data || []) as Prediction[],
+      data: (data || []) as PredictionWithRelations[],
       count: count || 0,
     };
   } catch (error) {
