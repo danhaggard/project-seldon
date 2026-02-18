@@ -75,7 +75,7 @@ export async function updateSession(request: NextRequest) {
       // If the user is logged in but lacks the role, send them to a 403 or Home
       const url = request.nextUrl.clone();
       url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page
-      // return NextResponse.redirect(url);
+      return NextResponse.redirect(url);
     }
   }
 
