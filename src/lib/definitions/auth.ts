@@ -1,16 +1,24 @@
 import * as z from "zod";
 
-import { Database } from "./database.types";
+import { Constants, Database } from "./database.types";
 
 // This extracts "admin" | "moderator" | "user" directly from the DB schema
 export type AppRole = Database["public"]["Enums"]["app_role"];
 
-// Optional: A constant for easy comparison/usage in UI
-export const ROLES: Record<Uppercase<AppRole>, AppRole> = {
-  ADMIN: "admin",
-  MODERATOR: "moderator",
-  USER: "user",
-} as const;
+export const appRoles = Constants.public.Enums.app_role;
+
+export const APP_ROLE = appRoles.reduce(
+  (acc, key) => {
+    acc[key.toUpperCase()] = key;
+    return acc;
+  },
+  {} as Record<string, string>,
+) as {
+  [K in (typeof appRoles)[number] as Uppercase<K>]: K;
+};
+
+// 2. Derive the type from the object (optional but recommended)
+export type AppRoleType = typeof APP_ROLE;
 
 export const ForgotPasswordSchema = z.object({
   email: z.email({ message: "Please enter a valid email." }),

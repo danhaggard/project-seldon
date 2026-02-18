@@ -1,19 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
-import { Prediction } from "@/lib/definitions/prediction";
 import { Guru } from "@/lib/definitions/guru";
+import { Prediction } from "@/lib/definitions/prediction";
+import { Category } from "../definitions/category";
+import { PredictionSource } from "../definitions/prediction-source";
 
-export interface PredictionWithGuru extends Prediction {
-  gurus: Guru; // Supabase joins return the joined table name as the key
-}
+export type PredictionByIdWithRelations = Prediction & {
+  categories: Pick<Category, "name"> | null;
+  gurus: Pick<Guru, "slug" | "name"> | null;
+  prediction_sources: Pick<PredictionSource, "url" | "type">[];
+};
 
 export async function getPredictionById(
   id: string,
-): Promise<PredictionWithGuru> {
+): Promise<PredictionByIdWithRelations> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("predictions")
-    .select("*, gurus(*)")
+    .select("*, gurus(*), categories (name), prediction_sources (url, type)")
     .eq("id", id)
     .single();
 
@@ -26,5 +30,5 @@ export async function getPredictionById(
     throw new Error("Prediction not found");
   }
 
-  return data as PredictionWithGuru;
+  return data as PredictionByIdWithRelations;
 }

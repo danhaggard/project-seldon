@@ -7,13 +7,57 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: number
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: number
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       gurus: {
         Row: {
           avatar_url: string | null
@@ -62,9 +106,173 @@ export type Database = {
         }
         Relationships: []
       }
+      prediction_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          prediction_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          prediction_id: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          prediction_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "prediction_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prediction_comments_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_quality_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          is_clear: boolean | null
+          is_verifiable: boolean | null
+          notes: string | null
+          prediction_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_clear?: boolean | null
+          is_verifiable?: boolean | null
+          notes?: string | null
+          prediction_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_clear?: boolean | null
+          is_verifiable?: boolean | null
+          notes?: string | null
+          prediction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_quality_ratings_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_sources: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          manual_archive_url: string | null
+          media_type: Database["public"]["Enums"]["media_type"]
+          prediction_id: string
+          status: Database["public"]["Enums"]["source_status"]
+          type: Database["public"]["Enums"]["source_type"]
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manual_archive_url?: string | null
+          media_type?: Database["public"]["Enums"]["media_type"]
+          prediction_id: string
+          status?: Database["public"]["Enums"]["source_status"]
+          type?: Database["public"]["Enums"]["source_type"]
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          manual_archive_url?: string | null
+          media_type?: Database["public"]["Enums"]["media_type"]
+          prediction_id?: string
+          status?: Database["public"]["Enums"]["source_status"]
+          type?: Database["public"]["Enums"]["source_type"]
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_sources_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prediction_votes: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          id: string
+          prediction_id: string
+          user_id: string
+          vote_outcome: boolean
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          prediction_id: string
+          user_id?: string
+          vote_outcome: boolean
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          prediction_id?: string
+          user_id?: string
+          vote_outcome?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prediction_votes_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "predictions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       predictions: {
         Row: {
-          category: string | null
+          category_id: number | null
+          community_vote_false_count: number | null
+          community_vote_true_count: number | null
           confidence_level: number | null
           created_at: string
           created_by: string | null
@@ -72,14 +280,20 @@ export type Database = {
           guru_id: string
           id: string
           prediction_date: string
-          resolution_date: string | null
-          source_url: string | null
+          quality_score: number | null
+          resolution_mechanism: string | null
+          resolution_window_end: string | null
+          resolution_window_start: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           status: Database["public"]["Enums"]["prediction_status"] | null
           tags: string[] | null
           title: string
         }
         Insert: {
-          category?: string | null
+          category_id?: number | null
+          community_vote_false_count?: number | null
+          community_vote_true_count?: number | null
           confidence_level?: number | null
           created_at?: string
           created_by?: string | null
@@ -87,14 +301,20 @@ export type Database = {
           guru_id: string
           id?: string
           prediction_date: string
-          resolution_date?: string | null
-          source_url?: string | null
+          quality_score?: number | null
+          resolution_mechanism?: string | null
+          resolution_window_end?: string | null
+          resolution_window_start?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: Database["public"]["Enums"]["prediction_status"] | null
           tags?: string[] | null
           title: string
         }
         Update: {
-          category?: string | null
+          category_id?: number | null
+          community_vote_false_count?: number | null
+          community_vote_true_count?: number | null
           confidence_level?: number | null
           created_at?: string
           created_by?: string | null
@@ -102,13 +322,24 @@ export type Database = {
           guru_id?: string
           id?: string
           prediction_date?: string
-          resolution_date?: string | null
-          source_url?: string | null
+          quality_score?: number | null
+          resolution_mechanism?: string | null
+          resolution_window_end?: string | null
+          resolution_window_start?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           status?: Database["public"]["Enums"]["prediction_status"] | null
           tags?: string[] | null
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "predictions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "predictions_guru_id_fkey"
             columns: ["guru_id"]
@@ -197,7 +428,16 @@ export type Database = {
     Enums: {
       app_permission: "gurus.delete" | "predictions.delete" | "users.manage"
       app_role: "admin" | "moderator" | "user"
-      prediction_status: "pending" | "correct" | "incorrect" | "void"
+      media_type: "text" | "video" | "audio" | "social"
+      prediction_status:
+        | "pending"
+        | "correct"
+        | "incorrect"
+        | "void"
+        | "in_evaluation"
+        | "vague"
+      source_status: "live" | "dead" | "archived"
+      source_type: "primary" | "secondary"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -323,11 +563,25 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_permission: ["gurus.delete", "predictions.delete", "users.manage"],
       app_role: ["admin", "moderator", "user"],
-      prediction_status: ["pending", "correct", "incorrect", "void"],
+      media_type: ["text", "video", "audio", "social"],
+      prediction_status: [
+        "pending",
+        "correct",
+        "incorrect",
+        "void",
+        "in_evaluation",
+        "vague",
+      ],
+      source_status: ["live", "dead", "archived"],
+      source_type: ["primary", "secondary"],
     },
   },
 } as const
+

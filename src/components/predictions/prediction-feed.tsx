@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Prediction } from "@/lib/definitions/prediction";
 import { PredictionCard } from "./prediction-card";
 import { cn } from "@/lib/utils";
+import { PredictionWithRelations } from "@/lib/data/gurus";
 
-export function PredictionFeed({ predictions }: { predictions: Prediction[] }) {
+export function PredictionFeed({
+  predictions,
+}: {
+  predictions: PredictionWithRelations[];
+}) {
   const [activeTab, setActiveTab] = useState<"pending" | "history">("pending");
 
   // Filter data based on active tab

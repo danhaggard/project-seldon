@@ -1,18 +1,20 @@
-export type PredictionStatus = "pending" | "correct" | "incorrect" | "void";
+import { Database, Constants } from "@/lib/definitions/database.types";
 
-export interface Prediction {
-  id: string;
-  guru_id: string;
-  title: string;
-  category: string;
-  confidence_level: number;
-  status: PredictionStatus;
-  prediction_date: string; // ISO String
-  resolution_date: string | null; // ISO String
-  source_url: string | null;
-  description: string | null;
-  gurus?: {
-    slug: string;
-    name?: string;
-  };
-}
+export type Prediction = Database["public"]["Tables"]["predictions"]["Row"];
+
+export type PredictionStatus = Database["public"]["Enums"]["prediction_status"];
+
+export const predictionStatuses = Constants.public.Enums.prediction_status;
+
+export const PREDICTION_STATUS = predictionStatuses.reduce(
+  (acc, key) => {
+    acc[key.toUpperCase()] = key;
+    return acc;
+  },
+  {} as Record<string, string>,
+) as {
+  [K in (typeof predictionStatuses)[number] as Uppercase<K>]: K;
+};
+
+// 2. Derive the type from the object (optional but recommended)
+export type PredictionStatusType = typeof PREDICTION_STATUS;

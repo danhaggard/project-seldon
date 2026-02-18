@@ -9,6 +9,8 @@ export async function GuruHeader({ slug }: { slug: string }) {
   // 1. Fetch data using the Data Layer
   const guru = await getGuruBySlug(slug);
 
+  console.log("guru", guru);
+
   // 2. Handle 404 (Data layer returns null on error/missing)
   if (!guru) {
     notFound();
@@ -16,12 +18,15 @@ export async function GuruHeader({ slug }: { slug: string }) {
 
   // Calculate accuracy safely to avoid divide by zero
   const accuracy =
-    guru.total_predictions > 0
+    (guru.total_predictions || 0) > 0
       ? Math.round(
-          (guru.correct_prediction_count / guru.total_predictions) * 100,
+          ((guru.correct_prediction_count || 0) /
+            (guru.total_predictions || 0)) *
+            100,
         )
       : 0;
 
+  const credibilityScore = Math.round(guru.credibility_score || 0);
   return (
     <div className="bg-card rounded-xl border shadow-sm p-6 md:p-8">
       <div className="flex flex-col md:flex-row gap-8">
@@ -126,7 +131,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
 
         {/* --- RIGHT COLUMN: The Score Ring --- */}
         <div className="md:w-64 flex flex-col items-center justify-center border-l-0 md:border-l pl-0 md:pl-8 pt-6 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
-          <CredibilityRing score={guru.credibility_score} />
+          <CredibilityRing score={credibilityScore} />
         </div>
       </div>
     </div>

@@ -1,12 +1,12 @@
 import { Suspense } from "react";
-import { GuruHeader } from "@/components/guru/guru-header";
+import { GuruHeader } from "@/app/gurus/[slug]/_components/guru-header";
 import { PredictionFeedContainer } from "@/components/predictions/prediction-feed-container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
 
 /* --- Skeletons --- */
 function HeaderSkeleton() {
-  return <Skeleton className="w-full h-[300px] rounded-xl" />;
+  return <Skeleton className="w-full h-75 rounded-xl" />;
 }
 
 function FeedSkeleton() {

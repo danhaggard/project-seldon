@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import { AppRole, ROLES } from "../definitions/auth";
+import { AppRole, APP_ROLE } from "../definitions/auth";
 
 /**
  * Extracts the user_role from the Supabase JWT
@@ -7,9 +7,9 @@ import { AppRole, ROLES } from "../definitions/auth";
 export function getUserRoles(accessToken: string): AppRole[] {
   try {
     const decoded: { user_roles?: AppRole[] | null } = jwtDecode(accessToken);
-    return decoded.user_roles || [ROLES.USER];
+    return decoded.user_roles || [APP_ROLE.USER];
   } catch {
-    return [ROLES.USER];
+    return [APP_ROLE.USER];
   }
 }
 

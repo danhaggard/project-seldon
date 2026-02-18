@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "update-types": "supabase gen types typescript --project-id 'kujvwymnzvlrqjvgrlyz' > src/lib/definitions/database.types.ts"
+    "update-types": "supabase gen types typescript --project-id 'kujvwymnzvlrqjvgrlyz' > src/lib/definitions/database.types.ts",
+    "update-types-local": "supabase gen types typescript --local > src/lib/definitions/database.types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

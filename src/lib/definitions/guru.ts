@@ -1,13 +1,4 @@
-export interface Guru {
-  id: string;
-  name: string;
-  slug: string;
-  bio: string | null;
-  avatar_url: string | null;
-  twitter_handle: string | null;
-  youtube_channel: string | null;
-  website: string | null;
-  credibility_score: number;
-  total_predictions: number;
-  correct_prediction_count: number;
-}
+import { Database } from "@/lib/definitions/database.types";
+
+// 1. Extract the shape of a 'guru' row directly from the generated types
+export type Guru = Database["public"]["Tables"]["gurus"]["Row"];

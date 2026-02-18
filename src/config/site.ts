@@ -1,4 +1,4 @@
-import { AppRole, ROLES } from "@/lib/definitions/auth";
+import { AppRole, APP_ROLE } from "@/lib/definitions/auth";
 import {
   Home,
   TrendingUp,
@@ -62,7 +62,7 @@ export const siteConfig: SiteConfig = {
       href: "/admin",
       icon: ShieldCheck,
       protected: true,
-      roles: [ROLES.ADMIN],
+      roles: [APP_ROLE.ADMIN],
     },
     {
       title: "Account",

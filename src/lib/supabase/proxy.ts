@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 import { siteConfig } from "@/config/site";
 import { getHasUserRoles } from "./auth-helpers";
-import { AppRole, ROLES } from "../definitions/auth";
+import { AppRole, APP_ROLE } from "../definitions/auth";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -62,7 +62,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const userRoles = (claims?.user_roles as AppRole[]) || [ROLES.USER];
+  const userRoles = (claims?.user_roles as AppRole[]) || [APP_ROLE.USER];
   const navItem = siteConfig.nav
     .sort((a, b) => b.href.length - a.href.length)
     .find((item) => request.nextUrl.pathname.startsWith(item.href));
