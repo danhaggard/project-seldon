@@ -9,3 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 export const hasEnvVars =
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+export function capitalize(str: string): string {
+  if (!str) {
+    // Handles empty and null strings
+    return str;
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -32,3 +32,30 @@ export async function getPredictionById(
 
   return data as PredictionByIdWithRelations;
 }
+
+export type PredictionByIdWithSources = Prediction & {
+  prediction_sources: PredictionSource[];
+};
+
+export async function getPredictionByIdWithSources(
+  id: string,
+): Promise<PredictionByIdWithSources> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("predictions")
+    .select("*, prediction_sources(*)")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Database Error (getPredictionById):", error);
+    throw new Error("Failed to fetch prediction details.");
+  }
+
+  if (!data) {
+    throw new Error("Prediction not found");
+  }
+
+  return data as PredictionByIdWithSources;
+}

@@ -5,11 +5,12 @@ import { CredibilityRing } from "./credibility-ring";
 import { notFound } from "next/navigation";
 import { getGuruBySlug } from "@/lib/data/gurus";
 
+import { Suspense } from "react";
+import { EditDetailsButton } from "./edit-details-button";
+
 export async function GuruHeader({ slug }: { slug: string }) {
   // 1. Fetch data using the Data Layer
   const guru = await getGuruBySlug(slug);
-
-  console.log("guru", guru);
 
   // 2. Handle 404 (Data layer returns null on error/missing)
   if (!guru) {
@@ -27,6 +28,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
       : 0;
 
   const credibilityScore = Math.round(guru.credibility_score || 0);
+
   return (
     <div className="bg-card rounded-xl border shadow-sm p-6 md:p-8">
       <div className="flex flex-col md:flex-row gap-8">
@@ -48,6 +50,13 @@ export async function GuruHeader({ slug }: { slug: string }) {
             <div className="flex flex-col justify-between h-full py-1">
               <div>
                 <h1 className="text-3xl font-bold mb-2">{guru.name}</h1>
+                <Suspense>
+                  <EditDetailsButton
+                    createdById={guru.created_by || ""}
+                    guruSlug={guru.slug}
+                  />
+                </Suspense>
+
                 <p className="text-muted-foreground text-sm max-w-md leading-relaxed">
                   {guru.bio || "No biography available."}
                 </p>
@@ -79,7 +88,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
                     asChild
                   >
                     <a
-                      href={guru.youtube_channel}
+                      href={`https://youtube/com/@${guru.youtube_channel}`}
                       target="_blank"
                       rel="noreferrer"
                     >

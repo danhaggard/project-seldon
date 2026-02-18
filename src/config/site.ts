@@ -1,14 +1,5 @@
 import { AppRole, APP_ROLE } from "@/lib/definitions/auth";
-import {
-  Home,
-  TrendingUp,
-  Users,
-  LineChart,
-  Settings,
-  ShieldCheck,
-  CircleUser,
-  LucideIcon,
-} from "lucide-react";
+import { Home, Users, ShieldCheck, CircleUser, LucideIcon } from "lucide-react";
 
 export type SiteConfig = {
   name: string;
@@ -21,6 +12,7 @@ export type SiteConfig = {
     roles?: AppRole[];
   }[];
   protectedPaths: (this: SiteConfig) => string[];
+  protectedRoutes: string[];
 };
 
 export const siteConfig: SiteConfig = {
@@ -30,13 +22,7 @@ export const siteConfig: SiteConfig = {
     {
       title: "Home",
       href: "/",
-      icon: Home, // Pass the component directly
-      protected: false,
-    },
-    {
-      title: "Trending",
-      href: "/trending",
-      icon: TrendingUp,
+      icon: Home,
       protected: false,
     },
     {
@@ -44,18 +30,6 @@ export const siteConfig: SiteConfig = {
       href: "/gurus",
       icon: Users,
       protected: false,
-    },
-    {
-      title: "My Predictions",
-      href: "/protected/predictions",
-      icon: LineChart,
-      protected: true,
-    },
-    {
-      title: "Settings",
-      href: "/protected/settings",
-      icon: Settings,
-      protected: true,
     },
     {
       title: "Admin Panel",
@@ -74,4 +48,10 @@ export const siteConfig: SiteConfig = {
   protectedPaths: function (this: SiteConfig) {
     return this.nav.filter((item) => item.protected).map((item) => item.href);
   },
+  protectedRoutes: [
+    "/dashboard",
+    "/settings",
+    "/gurus/*/edit",
+    "/gurus/*/predictions/*/edit",
+  ],
 };

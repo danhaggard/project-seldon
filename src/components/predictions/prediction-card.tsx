@@ -30,7 +30,6 @@ export function PredictionCard({
 }: {
   prediction: PredictionWithRelations;
 }) {
-  console.log("prediction", prediction);
   // 2. Updated Status Logic to handle 'in_evaluation' and 'vague'
   const isPending = prediction.status === "pending";
   const isVoting = prediction.status === "in_evaluation";

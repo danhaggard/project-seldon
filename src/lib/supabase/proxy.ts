@@ -5,6 +5,27 @@ import { siteConfig } from "@/config/site";
 import { getHasUserRoles } from "./auth-helpers";
 import { AppRole, APP_ROLE } from "../definitions/auth";
 
+/**
+ * Checks if a given path requires authentication.
+ * Supports simple wildcards (e.g., "/gurus/^/edit")
+ */
+export function isProtectedRoute(path: string): boolean {
+  return siteConfig.protectedRoutes.some((route) => {
+    // 1. Exact match
+    if (route === path) return true;
+
+    // 2. Wildcard match (simple regex conversion)
+    if (route.includes("*")) {
+      const regexStr = "^" + route.replace(/\*/g, "[^/]+") + "$";
+      const regex = new RegExp(regexStr);
+      return regex.test(path);
+    }
+
+    // 3. Sub-path match (e.g., /dashboard/settings matches /dashboard)
+    return path.startsWith(route) && !route.includes("*");
+  });
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,

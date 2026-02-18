@@ -3,6 +3,7 @@ import { GuruHeader } from "@/app/gurus/[slug]/_components/guru-header";
 import { PredictionFeedContainer } from "@/components/predictions/prediction-feed-container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
+import { GuruToastListener } from "./_components/guru-toast-listener";
 
 /* --- Skeletons --- */
 function HeaderSkeleton() {
@@ -37,6 +38,7 @@ export default async function GuruDetailPage({
 
   return (
     <div className="container space-y-8">
+      <GuruToastListener />
       {/* 1. Header Section */}
       {/* If this fails, we show a red error box where the header should be */}
 

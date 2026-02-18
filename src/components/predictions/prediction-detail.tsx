@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   ExternalLink,
   Calendar,
-  TrendingUp,
   CheckCircle2,
   XCircle,
   Clock,
@@ -18,6 +17,8 @@ import {
   PredictionStatus,
 } from "@/lib/definitions/prediction";
 import Link from "next/link";
+import { Suspense } from "react";
+import { EditPredictionDetailsButton } from "@/app/gurus/[slug]/predictions/[id]/edit/_components/edit-prediction-details-button";
 
 function getGuruSlug(prediction: PredictionByIdWithRelations) {
   const guruSlug = prediction.gurus?.slug;
@@ -79,6 +80,14 @@ export function PredictionDetail({
         </div>
         <h1 className="text-2xl font-bold leading-tight">{prediction.title}</h1>
       </div>
+
+      <Suspense>
+        <EditPredictionDetailsButton
+          createdById={prediction.created_by || ""}
+          guruSlug={prediction.gurus?.slug || ""}
+          predictionId={prediction.id}
+        />
+      </Suspense>
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 gap-4">

@@ -12,6 +12,7 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import { AuthButton, AuthButtonSkeleton } from "@/components/auth/auth-button";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
 
               {/* Main Feed Area */}
               <main className="py-6 min-w-0">{children}</main>
+              <Toaster />
 
               {/* Right Sidebar (Desktop XL only) */}
               <aside className="hidden xl:block py-6 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto">
