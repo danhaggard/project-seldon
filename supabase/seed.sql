@@ -49,3 +49,48 @@ VALUES
     '2021-10-10',
     '2026-12-31'
   );
+
+-- 3. Seed Users with CTEs
+WITH inserted_users AS (
+    INSERT INTO auth.users (
+        instance_id, id, aud, role, email, encrypted_password, 
+        email_confirmed_at, recovery_sent_at, last_sign_in_at, 
+        raw_app_meta_data, raw_user_meta_data, created_at, updated_at, 
+        confirmation_token, email_change, email_change_token_new, recovery_token
+    ) 
+    SELECT 
+        '00000000-0000-0000-0000-000000000000',
+        extensions.uuid_generate_v4(),
+        'authenticated', 
+        'authenticated',
+        'user' || (series_val) || '@example.com',
+        extensions.crypt('password123', extensions.gen_salt('bf')),
+        current_timestamp, current_timestamp, current_timestamp,
+        '{"provider":"email","providers":["email"]}', 
+        '{}',
+        current_timestamp, current_timestamp, 
+        '', '', '', ''
+    FROM generate_series(1, 10) AS series_val
+    RETURNING id, email  -- <--- CRITICAL FIX HERE
+),
+inserted_identities AS (
+    INSERT INTO auth.identities (
+        id, user_id, provider_id, identity_data, provider, 
+        last_sign_in_at, created_at, updated_at
+    )
+    SELECT
+        extensions.uuid_generate_v4(),
+        id,   -- This comes from the CTE above
+        id,
+        format('{"sub":"%s","email":"%s"}', id::text, email)::jsonb,
+        'email',
+        current_timestamp, current_timestamp, current_timestamp
+    FROM inserted_users -- <--- CRITICAL FIX: Select from the CTE, not the whole table
+    RETURNING user_id   -- <--- CTEs must return data if used in a chain
+)
+-- 4. Assign Admin Role to user1
+INSERT INTO public.user_roles (user_id, role)
+SELECT id, 'admin'
+FROM inserted_users
+WHERE email = 'user1@example.com'
+ON CONFLICT DO NOTHING;

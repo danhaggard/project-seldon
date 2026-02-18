@@ -20,5 +20,6 @@ export function getHasUserRoles(
 ): boolean {
   const userRoles = userRolesArg || getUserRoles(accessToken);
   const hasUserRoles = requiredRoles.some((role) => userRoles.includes(role));
+  console.log("userRoles", userRoles);
   return hasUserRoles;
 }
