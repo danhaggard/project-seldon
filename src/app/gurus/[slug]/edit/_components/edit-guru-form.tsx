@@ -1,6 +1,7 @@
 "use client";
 
 import { updateGuru } from "@/actions/guru";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +11,8 @@ import {
   FormCard,
   FormContent,
   FormGroup,
+  FormError,
+  FormFieldDescription,
 } from "@/components/layout/form-card";
 import Link from "next/link";
 import { Guru } from "@/lib/definitions/guru";
@@ -39,9 +42,9 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               disabled
               className="bg-muted text-muted-foreground cursor-not-allowed"
             />
-            <p className="text-xs text-muted-foreground">
+            <FormFieldDescription>
               Names cannot be changed to preserve URL structure.
-            </p>
+            </FormFieldDescription>
           </FormGroup>
 
           {/* Editable Fields */}
@@ -52,10 +55,10 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               name="bio"
               defaultValue={state?.inputs?.bio || guru.bio || ""}
               rows={4}
-              className={state?.errors?.bio ? "border-red-500" : ""}
+              className={cn(state?.errors?.bio && "border-red-500")}
               aria-describedby="bioError"
             />
-            <p aria-live="polite" id="bioError" className="text-sm text-red-500">{state?.errors?.bio && state.errors.bio[0]}</p>
+            <FormError id="bioError" errors={state?.errors?.bio} />
           </FormGroup>
 
           <FormGroup>
@@ -70,14 +73,11 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 defaultValue={
                   state?.inputs?.twitter_handle || guru.twitter_handle || ""
                 }
-                className="rounded-l-none"
+                className={cn("rounded-l-none", state?.errors?.twitter_handle && "border-red-500")}
+                aria-describedby="twitterHandleError"
               />
             </div>
-            {state?.errors?.twitter_handle && (
-              <p className="text-sm text-red-500">
-                {state.errors.twitter_handle[0]}
-              </p>
-            )}
+            <FormError id="twitterHandleError" errors={state?.errors?.twitter_handle} />
           </FormGroup>
 
           <FormGroup>
@@ -92,14 +92,11 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 defaultValue={
                   state?.inputs?.youtube_channel || guru.youtube_channel || ""
                 }
-                className="rounded-l-none"
+                className={cn("rounded-l-none", state?.errors?.youtube_channel && "border-red-500")}
+                aria-describedby="youtubeChannelError"
               />
             </div>
-            {state?.errors?.youtube_channel && (
-              <p className="text-sm text-red-500">
-                {state.errors.youtube_channel[0]}
-              </p>
-            )}
+            <FormError id="youtubeChannelError" errors={state?.errors?.youtube_channel} />
           </FormGroup>
 
           <FormGroup>
@@ -110,10 +107,10 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               type="url"
               placeholder="https://example.com"
               defaultValue={state?.inputs?.website || guru.website || ""}
+              className={cn(state?.errors?.website && "border-red-500")}
+              aria-describedby="websiteError"
             />
-            {state?.errors?.website && (
-              <p className="text-sm text-red-500">{state.errors.website[0]}</p>
-            )}
+            <FormError id="websiteError" errors={state?.errors?.website} />
           </FormGroup>
 
           {/* Global Error Message */}

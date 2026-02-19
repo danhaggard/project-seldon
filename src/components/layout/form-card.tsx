@@ -71,3 +71,37 @@ export function FormGroup({
 }) {
   return <div className={cn("grid gap-2", className)}>{children}</div>;
 }
+
+// 4. A single Form Error message
+export function FormError({
+  id,
+  errors,
+  className,
+}: {
+  id: string;
+  errors?: string[] | string | null;
+  className?: string;
+}) {
+  const errorText = Array.isArray(errors) ? errors[0] : errors;
+
+  return (
+    <p aria-live="polite" id={id} className={cn("text-sm text-red-500", className)}>
+      {errorText}
+    </p>
+  );
+}
+
+// 5. A qualitative help message for a field
+export function FormFieldDescription({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <p className={cn("text-xs text-muted-foreground", className)}>
+      {children}
+    </p>
+  );
+}

@@ -7,13 +7,17 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-const UpdateGuruSchema = z.object({
-  id: z.string().uuid(),
-  slug: z.string(),
+const CommonGuruSchema = {
   bio: z.string().min(1, "Bio is required"),
   twitter_handle: z.string().optional(),
   youtube_channel: z.string().optional(),
-  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  website: z.url("Must be a valid URL").optional().or(z.literal("")),
+}
+
+const UpdateGuruSchema = z.object({
+  id: z.uuid(),
+  slug: z.string(),
+  ...CommonGuruSchema,
 });
 
 export type UpdateGuruFormState =
@@ -124,10 +128,7 @@ export async function updateGuru(
 
 const CreateGuruSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  bio: z.string().optional(),
-  twitter_handle: z.string().optional(),
-  youtube_channel: z.string().optional(),
-  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  ...CommonGuruSchema,
 });
 
 export type CreateGuruFormState =
