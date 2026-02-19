@@ -50,7 +50,6 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
 
-  console.log("claims", claims);
   const isLoggedIn = !!claims;
   const pathname = request.nextUrl.pathname;
 
