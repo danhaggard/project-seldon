@@ -49,7 +49,7 @@ export async function getPredictionByIdWithSources(
     .single();
 
   if (error) {
-    console.error("Database Error (getPredictionById):", error);
+    console.error("Database Error (getPredictionByIdWithSources):", error);
     throw new Error("Failed to fetch prediction details.");
   }
 

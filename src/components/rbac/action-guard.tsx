@@ -24,6 +24,9 @@ export async function ActionGuard({
   resourceOwnerId,
   claims: passedClaims,
 }: ActionGuardProps) {
+  console.log("permission", permission);
+  console.log("resourceOwnerId", resourceOwnerId);
+
   // 1. Resolve claims (use passed claims, or fetch if not provided)
   let claims = passedClaims;
   if (claims === undefined) {
