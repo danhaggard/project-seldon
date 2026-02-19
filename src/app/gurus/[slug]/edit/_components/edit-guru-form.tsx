@@ -52,10 +52,10 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               name="bio"
               defaultValue={state?.inputs?.bio || guru.bio || ""}
               rows={4}
+              className={state?.errors?.bio ? "border-red-500" : ""}
+              aria-describedby="bioError"
             />
-            {state?.errors?.bio && (
-              <p className="text-sm text-red-500">{state.errors.bio[0]}</p>
-            )}
+            <p aria-live="polite" id="bioError" className="text-sm text-red-500">{state?.errors?.bio && state.errors.bio[0]}</p>
           </FormGroup>
 
           <FormGroup>

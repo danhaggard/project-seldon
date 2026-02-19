@@ -10,10 +10,10 @@ import { z } from "zod";
 const UpdateGuruSchema = z.object({
   id: z.string().uuid(),
   slug: z.string(),
-  bio: z.string().optional(),
+  bio: z.string().min(1, "Bio is required"),
   twitter_handle: z.string().optional(),
   youtube_channel: z.string().optional(),
-  website: z.string().url().optional().or(z.literal("")),
+  website: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 });
 
 export type UpdateGuruFormState =
