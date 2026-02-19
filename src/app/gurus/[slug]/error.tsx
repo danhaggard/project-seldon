@@ -25,7 +25,7 @@ export default function Error({
         <h1 className="text-2xl font-bold tracking-tight">
           Something went wrong!
         </h1>
-        <p className="text-muted-foreground max-w-[400px]">
+        <p className="text-muted-foreground max-w-100">
           We encountered an error while loading this guru profile. Please try
           again later.
         </p>

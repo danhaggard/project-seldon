@@ -10,7 +10,7 @@ export default function GuruNotFound() {
       </div>
       <div className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Guru Not Found</h1>
-        <p className="text-muted-foreground max-w-[400px]">
+        <p className="text-muted-foreground max-w-100">
           We couldn&apos;t find an expert with that name. They might have been
           removed, or the URL might be incorrect.
         </p>

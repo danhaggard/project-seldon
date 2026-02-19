@@ -8,7 +8,7 @@ export default async function InterceptedPredictionPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // <--- This await is critical in Next.js 15/16
+  const { id } = await params;
   const prediction = await getPredictionById(id);
 
   if (!prediction) notFound();

@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server"; // Standard client for RLS checks
 import { createAdminClient } from "@/lib/supabase/admin"; // Client with Service Role Key
 import { revalidatePath } from "next/cache";
-import { AppRole } from "@/lib/definitions/auth";
+import { APP_PERMISSION, AppRole } from "@/lib/definitions/rbac";
+import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 
 export type User = {
   id: string;
@@ -53,24 +53,18 @@ export async function toggleUserRole(
   role: AppRole,
   active: boolean,
 ) {
-  // 1. Initialize the standard client to check the CALLER'S session
-  const supabase = await createClient();
+  const claims = await getClaims();
 
-  // 2. Extract the JWT claims to check the caller's permissions
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  // Security Check: Is the caller logged in?
-  if (authError || !user) {
+  if (!claims) {
     throw new Error("Authentication required.");
   }
 
-  // Security Check: Does the caller have the 'admin' role in their JWT?
-  // We check the 'user_roles' array we set up in the custom hook.
-  const callerRoles = (user.app_metadata?.user_roles as string[]) || [];
-  if (!callerRoles.includes("admin")) {
+  const { isPermitted } = await checkPermission(
+    APP_PERMISSION.USERS_MANAGE,
+    claims,
+  );
+
+  if (!isPermitted) {
     throw new Error("Forbidden: You do not have permission to manage roles.");
   }
 
@@ -95,18 +89,23 @@ export async function toggleUserRole(
 }
 
 export async function deleteUser(userId: string) {
-  const supabase = await createClient();
-  const adminClient = await createAdminClient(); // Needs SUPABASE_SERVICE_ROLE_KEY
+  const claims = await getClaims();
 
-  // 1. Verify Admin Clearance
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (session?.user.app_metadata.user_role !== "admin") {
-    throw new Error("Unauthorized");
+  if (!claims) {
+    throw new Error("Authentication required.");
   }
 
-  // 2. Delete from Auth (irreversible)
+  const { isPermitted } = await checkPermission(
+    APP_PERMISSION.USERS_MANAGE,
+    claims,
+  );
+
+  if (!isPermitted) {
+    throw new Error("Forbidden: You do not have permission to delete users.");
+  }
+
+  const adminClient = await createAdminClient(); // Needs SUPABASE_SERVICE_ROLE_KEY
+
   const { error } = await adminClient.auth.admin.deleteUser(userId);
   if (error) throw error;
 

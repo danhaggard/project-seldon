@@ -14,7 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Loader2, RefreshCcw } from "lucide-react";
 import { toggleUserRole, deleteUser, fetchUsers, User } from "@/actions/admin";
 import { Constants } from "@/lib/definitions/database.types";
-import { AppRole } from "@/lib/definitions/auth";
+import { AppRole } from "@/lib/definitions/rbac";
 
 export function UserManagementTable() {
   const [users, setUsers] = useState<User[]>([]);
