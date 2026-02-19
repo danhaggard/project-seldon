@@ -1,7 +1,7 @@
 "use server";
 
 import { PredictionSource } from "@/lib/definitions/prediction-source";
-import { PERMISSION_BASE } from "@/lib/definitions/rbac";
+import { APP_PERMISSION, PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -203,4 +203,157 @@ export async function updatePrediction(
   const predictionPath = `/gurus/${validated.data.guru_slug}/predictions/${validated.data.id}`;
   revalidatePath(predictionPath);
   redirect(`${predictionPath}?status=updated`);
+}
+
+const CreatePredictionSchema = z.object({
+  guru_id: z.string().uuid(),
+  guru_slug: z.string(), // Needed for redirect routing
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  description: z.string().optional(),
+  category_id: z.coerce
+    .number()
+    .int()
+    .positive("Please select a valid category")
+    .optional(),
+  prediction_date: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Invalid prediction date",
+  }),
+  resolution_window_end: z.string().optional().or(z.literal("")),
+  confidence_level: z.coerce.number().min(0).max(100).optional(),
+  status: z.enum(["pending", "correct", "incorrect", "in_evaluation", "vague"]),
+  sources_json: z.string(),
+});
+
+export type CreatePredictionFormState =
+  | {
+      errors?: {
+        title?: string[];
+        description?: string[];
+        category_id?: string[];
+        prediction_date?: string[];
+        resolution_window_end?: string[];
+        confidence_level?: string[];
+        status?: string[];
+        sources_json?: string[];
+      };
+      message?: string;
+      inputs?: {
+        title: string;
+        description: string;
+        category_id: string;
+        prediction_date?: string;
+        resolution_window_end: string;
+        confidence_level: string;
+        status: string;
+        sources_json: string;
+      };
+    }
+  | undefined;
+
+export async function createPrediction(
+  state: CreatePredictionFormState,
+  formData: FormData,
+): Promise<CreatePredictionFormState> {
+  const claims = await getClaims();
+
+  // 1. Auth & Permission Check
+  if (!claims) {
+    return { message: "You must be logged in to create a prediction." };
+  }
+
+  const { isPermitted } = await checkPermission(
+    APP_PERMISSION.PREDICTIONS_CREATE,
+    claims,
+  );
+
+  if (!isPermitted) {
+    return { message: "You do not have permission to add predictions." };
+  }
+
+  // 2. Parse Data
+  const rawData = {
+    guru_id: formData.get("guru_id") as string,
+    guru_slug: formData.get("guru_slug") as string,
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    category_id: formData.get("category_id") as string,
+    prediction_date: formData.get("prediction_date") as string,
+    resolution_window_end: formData.get("resolution_window_end") as string,
+    confidence_level: formData.get("confidence_level") as string,
+    status: formData.get("status") as string,
+    sources_json: formData.get("sources_json") as string,
+  };
+
+  const validated = CreatePredictionSchema.safeParse(rawData);
+
+  if (!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors,
+      inputs: rawData,
+    };
+  }
+
+  const supabase = await createClient();
+
+  // 3. Insert Prediction Row
+  const { data: newPrediction, error: predError } = await supabase
+    .from("predictions")
+    .insert({
+      guru_id: validated.data.guru_id,
+      title: validated.data.title,
+      description: validated.data.description || null,
+      category_id: validated.data.category_id || null,
+      prediction_date: validated.data.prediction_date,
+      // Handle empty string from date input
+      resolution_window_end: validated.data.resolution_window_end
+        ? validated.data.resolution_window_end
+        : null,
+      confidence_level: validated.data.confidence_level || null,
+      status: validated.data.status,
+      created_by: claims.sub,
+      // created_by is typically handled by Supabase auth defaults, or explicitly insert `claims.sub` if your policy requires it.
+    })
+    .select("id")
+    .single();
+
+  if (predError || !newPrediction) {
+    return {
+      message: predError?.message || "Failed to insert prediction",
+      inputs: rawData,
+    };
+  }
+
+  // 4. Handle Sources Insert (No diffing required for creation!)
+  let submittedSources: Partial<PredictionSource>[] = [];
+  try {
+    submittedSources = JSON.parse(validated.data.sources_json || "[]");
+  } catch {
+    // If sources fail to parse, the prediction still created, so we might not want to hard fail.
+    console.error("Invalid sources JSON");
+  }
+
+  if (submittedSources.length > 0) {
+    const sourcesToInsert = submittedSources.map((s) => ({
+      prediction_id: newPrediction.id, // Link to the newly created row
+      url: s.url,
+      type: s.type,
+      status: s.status,
+      media_type: s.media_type,
+    }));
+
+    const { error: sourceError } = await supabase
+      .from("prediction_sources")
+      .insert(sourcesToInsert);
+
+    if (sourceError) {
+      console.error("Failed to insert sources:", sourceError);
+      // We don't return here because the core prediction was successfully created.
+      // You could handle this more elegantly depending on your UX needs.
+    }
+  }
+
+  // 5. Redirect
+  const guruPath = `/gurus/${validated.data.guru_slug}`;
+  revalidatePath(guruPath);
+  redirect(`${guruPath}?status=prediction_created`);
 }

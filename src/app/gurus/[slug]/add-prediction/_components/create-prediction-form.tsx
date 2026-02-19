@@ -1,6 +1,6 @@
 "use client";
 
-import { updatePrediction } from "@/actions/prediction";
+import { createPrediction } from "@/actions/prediction";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,92 +12,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   FormCard,
   FormContent,
   FormGroup,
 } from "@/components/layout/form-card";
-import { Database } from "@/lib/definitions/database.types";
+import { SourceManager } from "@/components/predictions/source-manager";
 import { format } from "date-fns";
-import { SourceManager } from "./source-manager";
-import { useState } from "react";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
-import Link from "next/link";
+import { Category } from "@/lib/definitions/category";
 
-type Category = Database["public"]["Tables"]["categories"]["Row"];
-
-interface EditPredictionFormProps {
-  prediction: PredictionByIdWithSources;
-  categories: Category[];
+interface CreatePredictionFormProps {
+  guruId: string;
   guruSlug: string;
+  guruName: string;
+  categories: Category[];
 }
-
 type PredictionSource = PredictionByIdWithSources["prediction_sources"][number];
 type PredictionSources = Partial<PredictionSource>[];
 
-export function EditPredictionForm({
-  prediction,
-  categories,
+export function CreatePredictionForm({
+  guruId,
   guruSlug,
-}: EditPredictionFormProps) {
+  guruName,
+  categories,
+}: CreatePredictionFormProps) {
   const [state, action, isPending] = useActionState(
-    updatePrediction,
+    createPrediction,
     undefined,
   );
 
-  // Helper to format date for HTML date input (YYYY-MM-DD)
-  const defaultDate = prediction.resolution_window_end
-    ? format(new Date(prediction.resolution_window_end), "yyyy-MM-dd")
-    : "";
+  // Start with empty sources since this is a new prediction
+  const [sources, setSources] = useState<PredictionSources>([]);
 
-  // Initialize Sources State from DB data
-  // We expect prediction.prediction_sources to be populated by your fetch query
-  const [sources, setSources] = useState<PredictionSources>(
-    prediction.prediction_sources || [],
-  );
+  // Default the prediction date to today
+  const todayDate = format(new Date(), "yyyy-MM-dd");
 
   return (
     <form action={action} className="max-w-2xl">
       <FormCard
         className="border-none py-0 shadow-none"
-        title={<h1>Edit Prediction</h1>}
-        description={<p>Update details for this prediction.</p>}
+        title={<h1>Log a Prediction for {guruName}</h1>}
+        description={
+          <p>Add a new claim to the database to begin tracking it.</p>
+        }
       >
         <FormContent>
-          {/* Hidden Fields */}
-          <input type="hidden" name="id" value={prediction.id} />
+          {/* Hidden Foreign Keys & Context */}
+          <input type="hidden" name="guru_id" value={guruId} />
           <input type="hidden" name="guru_slug" value={guruSlug} />
-          {/* HIDDEN INPUT: This transfers the state to the server action */}
           <input
             type="hidden"
             name="sources_json"
             value={JSON.stringify(sources)}
           />
 
-          {/* Title */}
           <FormGroup>
-            <Label htmlFor="title">Title</Label>
+            <Label htmlFor="title">Title / The Claim</Label>
             <Input
               id="title"
               name="title"
-              defaultValue={state?.inputs?.title || prediction.title}
+              placeholder="e.g. Bitcoin will reach $250k by 2030"
+              defaultValue={state?.inputs?.title || ""}
+              required
             />
             {state?.errors?.title && (
               <p className="text-sm text-red-500">{state.errors.title[0]}</p>
             )}
           </FormGroup>
 
-          {/* Category */}
           <FormGroup>
             <Label htmlFor="category_id">Category</Label>
             <Select
               name="category_id"
-              defaultValue={
-                state?.inputs?.category_id ||
-                prediction?.category_id?.toString() ||
-                undefined
-              }
+              defaultValue={state?.inputs?.category_id || undefined}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
@@ -117,29 +106,45 @@ export function EditPredictionForm({
             )}
           </FormGroup>
 
-          {/* Resolution Date */}
-          <FormGroup>
-            <Label htmlFor="resolution_window_end">Resolution Deadline</Label>
-            <Input
-              id="resolution_window_end"
-              name="resolution_window_end"
-              type="date"
-              defaultValue={state?.inputs?.resolution_window_end || defaultDate}
-            />
-            {state?.errors?.resolution_window_end && (
-              <p className="text-sm text-red-500">
-                {state.errors.resolution_window_end[0]}
-              </p>
-            )}
-          </FormGroup>
+          <div className="grid grid-cols-2 gap-4">
+            <FormGroup>
+              <Label htmlFor="prediction_date">Date Made</Label>
+              <Input
+                id="prediction_date"
+                name="prediction_date"
+                type="date"
+                defaultValue={state?.inputs?.prediction_date || todayDate}
+                required
+              />
+              {state?.errors?.prediction_date && (
+                <p className="text-sm text-red-500">
+                  {state.errors.prediction_date[0]}
+                </p>
+              )}
+            </FormGroup>
 
-          {/* Status & Confidence Row */}
+            <FormGroup>
+              <Label htmlFor="resolution_window_end">Deadline</Label>
+              <Input
+                id="resolution_window_end"
+                name="resolution_window_end"
+                type="date"
+                defaultValue={state?.inputs?.resolution_window_end || ""}
+              />
+              {state?.errors?.resolution_window_end && (
+                <p className="text-sm text-red-500">
+                  {state.errors.resolution_window_end[0]}
+                </p>
+              )}
+            </FormGroup>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <FormGroup>
               <Label htmlFor="status">Status</Label>
               <Select
                 name="status"
-                defaultValue={state?.inputs?.status || prediction.status || ""}
+                defaultValue={state?.inputs?.status || "pending"}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Status" />
@@ -155,51 +160,45 @@ export function EditPredictionForm({
             </FormGroup>
 
             <FormGroup>
-              <Label htmlFor="confidence_level">Confidence (%)</Label>
+              <Label htmlFor="confidence_level">
+                Guru&apos;s Confidence (%)
+              </Label>
               <Input
                 id="confidence_level"
                 name="confidence_level"
                 type="number"
                 min="0"
                 max="100"
-                defaultValue={
-                  state?.inputs?.confidence_level ??
-                  prediction.confidence_level ??
-                  50
-                }
+                placeholder="e.g. 90"
+                defaultValue={state?.inputs?.confidence_level || ""}
               />
             </FormGroup>
           </div>
 
-          {/* Description */}
           <FormGroup>
             <Label htmlFor="description">Description / Reasoning</Label>
             <Textarea
               id="description"
               name="description"
-              rows={5}
-              defaultValue={
-                state?.inputs?.description || prediction.description || ""
-              }
+              rows={4}
+              placeholder="Any additional context provided by the guru..."
+              defaultValue={state?.inputs?.description || ""}
             />
           </FormGroup>
 
-          {/* Insert Source Manager Here */}
+          {/* Mount the SourceManager with an empty array */}
           <SourceManager initialSources={sources} onChange={setSources} />
 
-          {/* Global Error */}
           {state?.message && (
             <p className="text-sm text-red-500 font-medium">{state.message}</p>
           )}
 
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-4 mt-6">
             <Button variant="outline" asChild disabled={isPending}>
-              <Link href={`/gurus/${guruSlug}/predictions/${prediction.id}`}>
-                Cancel
-              </Link>
+              <a href={`/gurus/${guruSlug}`}>Cancel</a>
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Changes"}
+              {isPending ? "Saving..." : "Create Prediction"}
             </Button>
           </div>
         </FormContent>

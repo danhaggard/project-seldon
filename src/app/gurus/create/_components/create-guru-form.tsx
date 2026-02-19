@@ -1,6 +1,6 @@
 "use client";
 
-import { updateGuru } from "@/actions/guru";
+import { createGuru } from "@/actions/guru";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,45 +12,42 @@ import {
   FormGroup,
 } from "@/components/layout/form-card";
 import Link from "next/link";
-import { Guru } from "@/lib/definitions/guru";
 
-export function EditGuruForm({ guru }: { guru: Guru }) {
-  const [state, action, isPending] = useActionState(updateGuru, undefined);
+export function CreateGuruForm() {
+  const [state, action, isPending] = useActionState(createGuru, undefined);
 
   return (
     <form action={action} className="space-y-6 max-w-2xl">
       <FormCard
         className="border-none py-0 shadow-none"
-        title={<h1>Edit Guru</h1>}
-        description={<p>Update profile details for {guru.name}.</p>}
+        title={<h1>Add a New Guru</h1>}
+        description={<p>Create a new profile to track public predictions.</p>}
       >
         <FormContent>
-          {/* Hidden Fields for ID and Slug (needed for the action) */}
-          <input type="hidden" name="id" value={guru.id} />
-          <input type="hidden" name="slug" value={guru.slug} />
-
-          {/* Read-Only Name Field */}
           <FormGroup>
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               name="name"
-              defaultValue={guru.name}
-              disabled
-              className="bg-muted text-muted-foreground cursor-not-allowed"
+              placeholder="e.g. Cathie Wood"
+              defaultValue={state?.inputs?.name || ""}
+              required
             />
+            {state?.errors?.name && (
+              <p className="text-sm text-red-500">{state.errors.name[0]}</p>
+            )}
             <p className="text-xs text-muted-foreground">
-              Names cannot be changed to preserve URL structure.
+              This will automatically generate their URL slug.
             </p>
           </FormGroup>
 
-          {/* Editable Fields */}
           <FormGroup>
             <Label htmlFor="bio">Bio</Label>
             <Textarea
               id="bio"
               name="bio"
-              defaultValue={state?.inputs?.bio || guru.bio || ""}
+              placeholder="A brief description of who they are and what they predict..."
+              defaultValue={state?.inputs?.bio || ""}
               rows={4}
             />
             {state?.errors?.bio && (
@@ -67,9 +64,8 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               <Input
                 id="twitter_handle"
                 name="twitter_handle"
-                defaultValue={
-                  state?.inputs?.twitter_handle || guru.twitter_handle || ""
-                }
+                placeholder="CathieDWood"
+                defaultValue={state?.inputs?.twitter_handle || ""}
                 className="rounded-l-none"
               />
             </div>
@@ -89,9 +85,8 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               <Input
                 id="youtube_channel"
                 name="youtube_channel"
-                defaultValue={
-                  state?.inputs?.youtube_channel || guru.youtube_channel || ""
-                }
+                placeholder="ARKInvest"
+                defaultValue={state?.inputs?.youtube_channel || ""}
                 className="rounded-l-none"
               />
             </div>
@@ -108,8 +103,8 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               id="website"
               name="website"
               type="url"
-              placeholder="https://example.com"
-              defaultValue={state?.inputs?.website || guru.website || ""}
+              placeholder="https://ark-invest.com"
+              defaultValue={state?.inputs?.website || ""}
             />
             {state?.errors?.website && (
               <p className="text-sm text-red-500">{state.errors.website[0]}</p>
@@ -123,10 +118,10 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>
-              <Link href={`/gurus/${guru.slug}`}>Cancel</Link>
+              <Link href="/gurus">Cancel</Link>
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Changes"}
+              {isPending ? "Creating..." : "Create Guru"}
             </Button>
           </div>
         </FormContent>

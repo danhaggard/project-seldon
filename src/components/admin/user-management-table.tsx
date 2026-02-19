@@ -25,7 +25,6 @@ export function UserManagementTable() {
     setLoading(true);
     try {
       const data = await fetchUsers();
-      console.log("data", data);
       setUsers(data);
     } catch (error) {
       console.error("Failed to load users:", error);
