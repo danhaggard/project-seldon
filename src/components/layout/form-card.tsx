@@ -111,16 +111,26 @@ export function FormFieldDescription({
 // 6. A global form alert/error message
 export function FormAlert({
   message,
+  type = "error",
   className,
 }: {
   message?: string | null;
+  type?: "error" | "success";
   className?: string;
 }) {
   if (!message) return null;
 
   return (
-    <p className={cn("text-sm text-red-500 font-medium", className)} role="alert">
+    <div 
+      className={cn(
+        "text-sm font-medium", 
+        type === "success" ? "text-green-600" : "text-red-500",
+        className
+      )} 
+      role={type === "success" ? "status" : "alert"}
+      aria-live={type === "success" ? "polite" : "assertive"}
+    >
       {message}
-    </p>
+    </div>
   );
 }

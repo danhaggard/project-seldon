@@ -1,6 +1,7 @@
 "use client";
 
 import { updatePrediction } from "@/actions/prediction";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +18,11 @@ import {
   FormCard,
   FormContent,
   FormGroup,
+  FormError,
+  FormAlert,
 } from "@/components/layout/form-card";
 import { format } from "date-fns";
-import { SourceManager } from "./source-manager";
+import { SourceManager } from "../../../../../../../components/predictions/source-manager";
 import { useState } from "react";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
 import Link from "next/link";
@@ -57,7 +60,7 @@ export function EditPredictionForm({
   );
 
   return (
-    <form action={action} className="max-w-2xl">
+    <form action={action} className="max-w-2xl" aria-busy={isPending}>
       <FormCard
         className="border-none py-0 shadow-none"
         title={<h1>Edit Prediction</h1>}
@@ -81,10 +84,11 @@ export function EditPredictionForm({
               id="title"
               name="title"
               defaultValue={state?.inputs?.title || prediction.title}
+              className={cn(state?.errors?.title && "border-red-500")}
+              aria-invalid={!!state?.errors?.title}
+              aria-describedby="titleError"
             />
-            {state?.errors?.title && (
-              <p className="text-sm text-red-500">{state.errors.title[0]}</p>
-            )}
+            <FormError id="titleError" errors={state?.errors?.title} />
           </FormGroup>
 
           {/* Category */}
@@ -98,7 +102,11 @@ export function EditPredictionForm({
                 undefined
               }
             >
-              <SelectTrigger>
+              <SelectTrigger
+                className={cn(state?.errors?.category_id && "border-red-500")}
+                aria-invalid={!!state?.errors?.category_id}
+                aria-describedby="categoryError"
+              >
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
@@ -109,11 +117,7 @@ export function EditPredictionForm({
                 ))}
               </SelectContent>
             </Select>
-            {state?.errors?.category_id && (
-              <p className="text-sm text-red-500">
-                {state.errors.category_id[0]}
-              </p>
-            )}
+            <FormError id="categoryError" errors={state?.errors?.category_id} />
           </FormGroup>
 
           {/* Resolution Date */}
@@ -124,12 +128,11 @@ export function EditPredictionForm({
               name="resolution_window_end"
               type="date"
               defaultValue={state?.inputs?.resolution_window_end || defaultDate}
+              className={cn(state?.errors?.resolution_window_end && "border-red-500")}
+              aria-invalid={!!state?.errors?.resolution_window_end}
+              aria-describedby="resolutionWindowEndError"
             />
-            {state?.errors?.resolution_window_end && (
-              <p className="text-sm text-red-500">
-                {state.errors.resolution_window_end[0]}
-              </p>
-            )}
+            <FormError id="resolutionWindowEndError" errors={state?.errors?.resolution_window_end} />
           </FormGroup>
 
           {/* Status & Confidence Row */}
@@ -140,7 +143,11 @@ export function EditPredictionForm({
                 name="status"
                 defaultValue={state?.inputs?.status || prediction.status || ""}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  className={cn(state?.errors?.status && "border-red-500")}
+                  aria-invalid={!!state?.errors?.status}
+                  aria-describedby="statusError"
+                >
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,6 +158,7 @@ export function EditPredictionForm({
                   <SelectItem value="vague">Vague</SelectItem>
                 </SelectContent>
               </Select>
+              <FormError id="statusError" errors={state?.errors?.status} />
             </FormGroup>
 
             <FormGroup>
@@ -166,7 +174,11 @@ export function EditPredictionForm({
                   prediction.confidence_level ??
                   50
                 }
+                className={cn(state?.errors?.confidence_level && "border-red-500")}
+                aria-invalid={!!state?.errors?.confidence_level}
+                aria-describedby="confidenceLevelError"
               />
+              <FormError id="confidenceLevelError" errors={state?.errors?.confidence_level} />
             </FormGroup>
           </div>
 
@@ -180,16 +192,18 @@ export function EditPredictionForm({
               defaultValue={
                 state?.inputs?.description || prediction.description || ""
               }
+              className={cn(state?.errors?.description && "border-red-500")}
+              aria-invalid={!!state?.errors?.description}
+              aria-describedby="descriptionError"
             />
+            <FormError id="descriptionError" errors={state?.errors?.description} />
           </FormGroup>
 
           {/* Insert Source Manager Here */}
           <SourceManager initialSources={sources} onChange={setSources} />
 
           {/* Global Error */}
-          {state?.message && (
-            <p className="text-sm text-red-500 font-medium">{state.message}</p>
-          )}
+          <FormAlert message={state?.message} />
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>

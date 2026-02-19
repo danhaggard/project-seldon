@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { AccountForm } from "./components/account-form";
+import { AccountForm } from "./_components/account-form";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getClaims } from "@/lib/supabase/rbac";
 import { getProfile } from "@/lib/data/profiles";

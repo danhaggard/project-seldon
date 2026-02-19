@@ -1,14 +1,15 @@
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout";
+} from "@/components/layout/form-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AccountLoading() {
   return (
-    <div className="container py-10">
-      <AuthCard
+    <div className="container">
+      <FormCard
+        className="border-none py-0 shadow-none"
         title="Profile Settings"
         description="Update your personal information."
       >
@@ -40,7 +41,7 @@ export default function AccountLoading() {
           {/* Button Skeleton */}
           <Skeleton className="h-10 w-full mt-2" />
         </FormContent>
-      </AuthCard>
+      </FormCard>
     </div>
   );
 }

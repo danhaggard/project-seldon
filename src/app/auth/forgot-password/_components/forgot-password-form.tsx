@@ -2,15 +2,18 @@
 
 import { useActionState } from "react";
 import { forgotPassword } from "@/actions/auth";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout";
+  FormError,
+  FormAlert,
+} from "@/components/layout/form-card";
 
 export function ForgotPasswordForm({
   className,
@@ -22,9 +25,9 @@ export function ForgotPasswordForm({
     <div className={className} {...props}>
       {state?.success ? (
         /* --- 1. Success View --- */
-        <AuthCard
-          title="Check Your Email"
-          description="Password reset instructions have been sent to your email."
+        <FormCard
+          title={<h1>Check Your Email</h1>}
+          description={<p>Password reset instructions have been sent to your email.</p>}
         >
           <div className="flex flex-col gap-4">
             <p className="text-sm text-muted-foreground">
@@ -35,13 +38,13 @@ export function ForgotPasswordForm({
               <Link href="/auth/login">Back to Login</Link>
             </Button>
           </div>
-        </AuthCard>
+        </FormCard>
       ) : (
         /* --- 2. Input View --- */
-        <form action={action}>
-          <AuthCard
-            title="Reset Your Password"
-            description="Type in your email and we'll send you a link to reset your password"
+        <form action={action} aria-busy={isPending}>
+          <FormCard
+            title={<h1>Reset Your Password</h1>}
+            description={<p>Type in your email and we&apos;ll send you a link to reset your password</p>}
             footer={
               <div className="text-center text-sm text-muted-foreground">
                 Remember your password?{" "}
@@ -65,27 +68,23 @@ export function ForgotPasswordForm({
                   placeholder="m@example.com"
                   defaultValue={state?.inputs?.email}
                   required
+                  autoComplete="email"
+                  className={cn(state?.errors?.email && "border-red-500")}
+                  aria-invalid={!!state?.errors?.email}
+                  aria-describedby="emailError"
                 />
-                {state?.errors?.email && (
-                  <p className="text-sm text-red-500">
-                    {state.errors.email[0]}
-                  </p>
-                )}
+                <FormError id="emailError" errors={state?.errors?.email} />
               </FormGroup>
 
               {/* Global API Error */}
-              {state?.message && (
-                <p className="text-sm text-red-500 font-medium">
-                  {state.message}
-                </p>
-              )}
+              <FormAlert message={state?.message} />
 
               {/* Submit Button */}
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? "Sending..." : "Send reset email"}
               </Button>
             </FormContent>
-          </AuthCard>
+          </FormCard>
         </form>
       )}
     </div>

@@ -2,15 +2,18 @@
 
 import { useActionState } from "react";
 import { updateProfile } from "@/actions/profile";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout";
+  FormError,
+  FormAlert,
+} from "@/components/layout/form-card";
 
 // Define the shape of the data we expect from Supabase
 interface ProfileData {
@@ -24,10 +27,11 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
   const [state, action, isPending] = useActionState(updateProfile, undefined);
 
   return (
-    <form action={action}>
-      <AuthCard
-        title="Profile Settings"
-        description="Update your personal information."
+    <form action={action} aria-busy={isPending}>
+      <FormCard
+        className="border-none py-0 shadow-none"
+        title={<h1>Profile Settings</h1>}
+        description={<p>Update your personal information.</p>}
       >
         <FormContent>
           {/* Email (Read Only) */}
@@ -37,6 +41,7 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
               id="email"
               value={profile.email}
               disabled
+              autoComplete="email"
               className="bg-muted text-muted-foreground"
             />
           </FormGroup>
@@ -49,10 +54,12 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
               name="fullName"
               placeholder="Your full name"
               defaultValue={profile.full_name || ""}
+              autoComplete="name"
+              className={cn(state?.errors?.fullName && "border-red-500")}
+              aria-invalid={!!state?.errors?.fullName}
+              aria-describedby="fullNameError"
             />
-            {state?.errors?.fullName && (
-              <p className="text-sm text-red-500">{state.errors.fullName[0]}</p>
-            )}
+            <FormError id="fullNameError" errors={state?.errors?.fullName} />
           </FormGroup>
 
           {/* Username */}
@@ -63,10 +70,12 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
               name="username"
               placeholder="username"
               defaultValue={profile.username || ""}
+              autoComplete="username"
+              className={cn(state?.errors?.username && "border-red-500")}
+              aria-invalid={!!state?.errors?.username}
+              aria-describedby="usernameError"
             />
-            {state?.errors?.username && (
-              <p className="text-sm text-red-500">{state.errors.username[0]}</p>
-            )}
+            <FormError id="usernameError" errors={state?.errors?.username} />
           </FormGroup>
 
           {/* Website */}
@@ -78,22 +87,19 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
               type="url"
               placeholder="https://example.com"
               defaultValue={profile.website || ""}
+              autoComplete="url"
+              className={cn(state?.errors?.website && "border-red-500")}
+              aria-invalid={!!state?.errors?.website}
+              aria-describedby="websiteError"
             />
-            {state?.errors?.website && (
-              <p className="text-sm text-red-500">{state.errors.website[0]}</p>
-            )}
+            <FormError id="websiteError" errors={state?.errors?.website} />
           </FormGroup>
 
           {/* Success / Error Message */}
-          {state?.message && (
-            <div
-              className={`text-sm font-medium ${
-                state.success ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {state.message}
-            </div>
-          )}
+          <FormAlert 
+            message={state?.message} 
+            type={state?.success ? "success" : "error"} 
+          />
 
           {/* Submit Button */}
           <Button type="submit" disabled={isPending} className="w-full">
@@ -101,7 +107,7 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
             {isPending ? "Saving..." : "Update Profile"}
           </Button>
         </FormContent>
-      </AuthCard>
+      </FormCard>
     </form>
   );
 }

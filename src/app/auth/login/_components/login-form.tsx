@@ -2,15 +2,18 @@
 
 import { useActionState } from "react";
 import { login } from "@/actions/auth";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout"; // Import the new system
+  FormError,
+  FormAlert,
+} from "@/components/layout/form-card";
 
 export function LoginForm({
   className,
@@ -20,10 +23,10 @@ export function LoginForm({
 
   return (
     <div className={className} {...props}>
-      <form action={action}>
-        <AuthCard
-          title="Login"
-          description="Enter your email below to login to your account"
+      <form action={action} aria-busy={isPending}>
+        <FormCard
+          title={<h1>Login</h1>}
+          description={<p>Enter your email below to login to your account</p>}
           footer={
             <div className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
@@ -47,10 +50,12 @@ export function LoginForm({
                 placeholder="m@example.com"
                 defaultValue={state?.inputs?.email}
                 required
+                autoComplete="email"
+                className={cn(state?.errors?.email && "border-red-500")}
+                aria-invalid={!!state?.errors?.email}
+                aria-describedby="emailError"
               />
-              {state?.errors?.email && (
-                <p className="text-sm text-red-500">{state.errors.email[0]}</p>
-              )}
+              <FormError id="emailError" errors={state?.errors?.email} />
             </FormGroup>
 
             {/* Password Group */}
@@ -64,26 +69,27 @@ export function LoginForm({
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" name="password" type="password" required />
-              {state?.errors?.password && (
-                <p className="text-sm text-red-500">
-                  {state.errors.password[0]}
-                </p>
-              )}
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                required 
+                autoComplete="current-password"
+                className={cn(state?.errors?.password && "border-red-500")}
+                aria-invalid={!!state?.errors?.password}
+                aria-describedby="passwordError"
+              />
+              <FormError id="passwordError" errors={state?.errors?.password} />
             </FormGroup>
 
             {/* Global Error */}
-            {state?.message && (
-              <p className="text-sm text-red-500 font-medium">
-                {state.message}
-              </p>
-            )}
+            <FormAlert message={state?.message} />
 
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Logging in..." : "Login"}
             </Button>
           </FormContent>
-        </AuthCard>
+        </FormCard>
       </form>
     </div>
   );

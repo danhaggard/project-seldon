@@ -1,6 +1,7 @@
 "use client";
 
 import { createPrediction } from "@/actions/prediction";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +18,8 @@ import {
   FormCard,
   FormContent,
   FormGroup,
+  FormError,
+  FormAlert,
 } from "@/components/layout/form-card";
 import { SourceManager } from "@/components/predictions/source-manager";
 import { format } from "date-fns";
@@ -50,7 +53,7 @@ export function CreatePredictionForm({
   const todayDate = format(new Date(), "yyyy-MM-dd");
 
   return (
-    <form action={action} className="max-w-2xl">
+    <form action={action} className="max-w-2xl" aria-busy={isPending}>
       <FormCard
         className="border-none py-0 shadow-none"
         title={<h1>Log a Prediction for {guruName}</h1>}
@@ -76,10 +79,11 @@ export function CreatePredictionForm({
               placeholder="e.g. Bitcoin will reach $250k by 2030"
               defaultValue={state?.inputs?.title || ""}
               required
+              className={cn(state?.errors?.title && "border-red-500")}
+              aria-invalid={!!state?.errors?.title}
+              aria-describedby="titleError"
             />
-            {state?.errors?.title && (
-              <p className="text-sm text-red-500">{state.errors.title[0]}</p>
-            )}
+            <FormError id="titleError" errors={state?.errors?.title} />
           </FormGroup>
 
           <FormGroup>
@@ -88,7 +92,11 @@ export function CreatePredictionForm({
               name="category_id"
               defaultValue={state?.inputs?.category_id || undefined}
             >
-              <SelectTrigger>
+              <SelectTrigger
+                className={cn(state?.errors?.category_id && "border-red-500")}
+                aria-invalid={!!state?.errors?.category_id}
+                aria-describedby="categoryIdError"
+              >
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
@@ -99,11 +107,7 @@ export function CreatePredictionForm({
                 ))}
               </SelectContent>
             </Select>
-            {state?.errors?.category_id && (
-              <p className="text-sm text-red-500">
-                {state.errors.category_id[0]}
-              </p>
-            )}
+            <FormError id="categoryIdError" errors={state?.errors?.category_id} />
           </FormGroup>
 
           <div className="grid grid-cols-2 gap-4">
@@ -115,12 +119,11 @@ export function CreatePredictionForm({
                 type="date"
                 defaultValue={state?.inputs?.prediction_date || todayDate}
                 required
+                className={cn(state?.errors?.prediction_date && "border-red-500")}
+                aria-invalid={!!state?.errors?.prediction_date}
+                aria-describedby="predictionDateError"
               />
-              {state?.errors?.prediction_date && (
-                <p className="text-sm text-red-500">
-                  {state.errors.prediction_date[0]}
-                </p>
-              )}
+              <FormError id="predictionDateError" errors={state?.errors?.prediction_date} />
             </FormGroup>
 
             <FormGroup>
@@ -130,12 +133,11 @@ export function CreatePredictionForm({
                 name="resolution_window_end"
                 type="date"
                 defaultValue={state?.inputs?.resolution_window_end || ""}
+                className={cn(state?.errors?.resolution_window_end && "border-red-500")}
+                aria-invalid={!!state?.errors?.resolution_window_end}
+                aria-describedby="resolutionWindowEndError"
               />
-              {state?.errors?.resolution_window_end && (
-                <p className="text-sm text-red-500">
-                  {state.errors.resolution_window_end[0]}
-                </p>
-              )}
+              <FormError id="resolutionWindowEndError" errors={state?.errors?.resolution_window_end} />
             </FormGroup>
           </div>
 
@@ -146,7 +148,11 @@ export function CreatePredictionForm({
                 name="status"
                 defaultValue={state?.inputs?.status || "pending"}
               >
-                <SelectTrigger>
+                <SelectTrigger
+                  className={cn(state?.errors?.status && "border-red-500")}
+                  aria-invalid={!!state?.errors?.status}
+                  aria-describedby="statusError"
+                >
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,6 +163,7 @@ export function CreatePredictionForm({
                   <SelectItem value="vague">Vague</SelectItem>
                 </SelectContent>
               </Select>
+              <FormError id="statusError" errors={state?.errors?.status} />
             </FormGroup>
 
             <FormGroup>
@@ -171,7 +178,11 @@ export function CreatePredictionForm({
                 max="100"
                 placeholder="e.g. 90"
                 defaultValue={state?.inputs?.confidence_level || ""}
+                className={cn(state?.errors?.confidence_level && "border-red-500")}
+                aria-invalid={!!state?.errors?.confidence_level}
+                aria-describedby="confidenceLevelError"
               />
+              <FormError id="confidenceLevelError" errors={state?.errors?.confidence_level} />
             </FormGroup>
           </div>
 
@@ -183,15 +194,17 @@ export function CreatePredictionForm({
               rows={4}
               placeholder="Any additional context provided by the guru..."
               defaultValue={state?.inputs?.description || ""}
+              className={cn(state?.errors?.description && "border-red-500")}
+              aria-invalid={!!state?.errors?.description}
+              aria-describedby="descriptionError"
             />
+            <FormError id="descriptionError" errors={state?.errors?.description} />
           </FormGroup>
 
           {/* Mount the SourceManager with an empty array */}
           <SourceManager initialSources={sources} onChange={setSources} />
 
-          {state?.message && (
-            <p className="text-sm text-red-500 font-medium">{state.message}</p>
-          )}
+          <FormAlert message={state?.message} />
 
           <div className="flex justify-end gap-4 mt-6">
             <Button variant="outline" asChild disabled={isPending}>

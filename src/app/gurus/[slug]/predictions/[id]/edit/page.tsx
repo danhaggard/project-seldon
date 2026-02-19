@@ -1,4 +1,4 @@
-import { EditPredictionForm } from "@/components/predictions/edit-prediction-form";
+import { EditPredictionForm } from "@/app/gurus/[slug]/predictions/[id]/edit/_components/edit-prediction-form";
 import { notFound, redirect } from "next/navigation";
 import { getPredictionByIdWithSources } from "@/lib/data/predictions";
 import { checkPermission, getClaims } from "@/lib/supabase/rbac";
