@@ -1,18 +1,28 @@
-import { AppRole, APP_ROLE } from "@/lib/definitions/auth";
+import {
+  AppPermission,
+  APP_PERMISSION,
+  PERMISSION_BASE,
+  PermissionBase,
+} from "@/lib/definitions/rbac";
 import { Home, Users, ShieldCheck, CircleUser, LucideIcon } from "lucide-react";
+
+export type NavItem = {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+  requireAuth?: boolean;
+  requiredPermission?: AppPermission;
+};
 
 export type SiteConfig = {
   name: string;
   description: string;
-  nav: {
-    title: string;
-    href: string;
-    icon: LucideIcon; // <--- Store the component itself, not a string
-    protected?: boolean;
-    roles?: AppRole[];
-  }[];
-  protectedPaths: (this: SiteConfig) => string[];
-  protectedRoutes: string[];
+  nav: NavItem[];
+  // Helper to grab all nav links that require login
+  authRequiredPaths: (this: SiteConfig) => string[];
+  // Explicit mapping of route prefixes to required JWT permissions (for Middleware)
+  routePermissions: Record<string, AppPermission>;
+  dynamicRoutePermissions: Record<string, AppPermission | PermissionBase>;
 };
 
 export const siteConfig: SiteConfig = {
@@ -23,35 +33,41 @@ export const siteConfig: SiteConfig = {
       title: "Home",
       href: "/",
       icon: Home,
-      protected: false,
     },
     {
       title: "Gurus",
       href: "/gurus",
       icon: Users,
-      protected: false,
     },
     {
       title: "Admin Panel",
       href: "/admin",
       icon: ShieldCheck,
-      protected: true,
-      roles: [APP_ROLE.ADMIN],
+      requireAuth: true,
+      requiredPermission: APP_PERMISSION.USERS_MANAGE, // Clear, explicit intent
     },
     {
       title: "Account",
       href: "/account",
-      protected: true,
       icon: CircleUser,
+      requireAuth: true, // Just needs a logged-in user
     },
   ],
-  protectedPaths: function (this: SiteConfig) {
-    return this.nav.filter((item) => item.protected).map((item) => item.href);
+
+  authRequiredPaths: function (this: SiteConfig) {
+    return this.nav.filter((item) => item.requireAuth).map((item) => item.href);
   },
-  protectedRoutes: [
-    "/dashboard",
-    "/settings",
-    "/gurus/*/edit",
-    "/gurus/*/predictions/*/edit",
-  ],
+
+  routePermissions: {
+    "/admin": APP_PERMISSION.USERS_MANAGE,
+    // If you add a global categories page later:
+    // "/categories/manage": APP_PERMISSION.CATEGORIES_MANAGE,
+  },
+
+  // DYNAMIC RESOURCE ROUTES (Wildcards)
+  // The middleware will verify the user has AT LEAST the base permission (e.g. .own or .any)
+  dynamicRoutePermissions: {
+    "/gurus/*/edit": PERMISSION_BASE.GURUS_UPDATE,
+    "/gurus/*/predictions/*/edit": PERMISSION_BASE.PREDICTIONS_UPDATE,
+  } as Record<string, PermissionBase>,
 };

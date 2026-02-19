@@ -1,6 +1,7 @@
 "use server";
 
-import { getIsAdminModCreator } from "@/lib/supabase/auth-helpers";
+import { PERMISSION_BASE } from "@/lib/definitions/rbac";
+import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -38,14 +39,9 @@ export async function updateGuru(
   state: UpdateGuruFormState,
   formData: FormData,
 ): Promise<UpdateGuruFormState> {
-  const supabase = await createClient();
+  const claims = await getClaims();
 
-  // 1. Get Current User
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!claims) {
     return { message: "You must be logged in to update guru details." };
   }
 
@@ -73,6 +69,8 @@ export async function updateGuru(
     };
   }
 
+  const supabase = await createClient();
+
   // 3. Authorization Check (Server Side)
   // Fetch the guru to check ownership, AND fetch user roles
   const { data: guru } = await supabase
@@ -81,8 +79,16 @@ export async function updateGuru(
     .eq("id", validatedFields.data.id)
     .single();
 
-  const canEdit = await getIsAdminModCreator(guru?.created_by);
-  if (!canEdit) {
+  if (!guru) {
+    return { message: "Guru not found. It may have been deleted." };
+  }
+
+  const { isPermitted } = await checkPermission(
+    PERMISSION_BASE.GURUS_UPDATE,
+    guru?.created_by,
+    claims,
+  );
+  if (!isPermitted) {
     return {
       message: "You do not have the required permissions to edit this guru.",
     };

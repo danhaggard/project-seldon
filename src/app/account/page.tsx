@@ -1,25 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AccountForm } from "./components/account-form";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { getClaims } from "@/lib/supabase/rbac";
+import { getProfile } from "@/lib/data/profiles";
 
 export default async function AccountPage() {
-  const supabase = await createClient();
+  const claims = await getClaims();
 
-  // 1. Get User
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError || !user) {
-    redirect("/auth/login");
+  if (!claims) {
+    redirect("/login");
   }
-
   // 2. Get Profile Data
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("full_name, username, website, avatar_url")
-    .eq("id", user.id)
-    .single();
+  const profile = await getProfile(claims.sub);
 
   // Handle case where profile doesn't exist yet (first login)
   const profileData = profile || {
@@ -32,12 +24,16 @@ export default async function AccountPage() {
   // Combine user email with profile data
   const combinedData = {
     ...profileData,
-    email: user.email!,
+    email: claims.email!,
   };
 
   return (
     <div className="container">
       <AccountForm profile={combinedData} />
+      <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
+        <p>Theme Toggle</p>
+        <ThemeSwitcher />
+      </footer>
     </div>
   );
 }

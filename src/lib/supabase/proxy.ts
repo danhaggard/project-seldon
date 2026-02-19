@@ -2,29 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 import { siteConfig } from "@/config/site";
-import { getHasUserRoles } from "./auth-helpers";
-import { AppRole, APP_ROLE } from "../definitions/auth";
-
-/**
- * Checks if a given path requires authentication.
- * Supports simple wildcards (e.g., "/gurus/^/edit")
- */
-export function isProtectedRoute(path: string): boolean {
-  return siteConfig.protectedRoutes.some((route) => {
-    // 1. Exact match
-    if (route === path) return true;
-
-    // 2. Wildcard match (simple regex conversion)
-    if (route.includes("*")) {
-      const regexStr = "^" + route.replace(/\*/g, "[^/]+") + "$";
-      const regex = new RegExp(regexStr);
-      return regex.test(path);
-    }
-
-    // 3. Sub-path match (e.g., /dashboard/settings matches /dashboard)
-    return path.startsWith(route) && !route.includes("*");
-  });
-}
+import { hasPermission, hasPermissionBase } from "./rbac";
+import { PermissionBase } from "../definitions/rbac";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -71,32 +50,54 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
 
-  // Check if route requires auth and redirect to login if required
-  const protectedPaths = siteConfig.protectedPaths();
-  const isProtected = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path),
-  );
+  const isLoggedIn = !!claims;
+  const pathname = request.nextUrl.pathname;
 
-  if (isProtected && !claims) {
+  // 2. Check Basic Auth Routes (e.g., /account)
+  const requiresAuth = siteConfig.authRequiredPaths().includes(pathname);
+  if (requiresAuth && !isLoggedIn) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  const userRoles = (claims?.user_roles as AppRole[]) || [APP_ROLE.USER];
-  const navItem = siteConfig.nav
-    .sort((a, b) => b.href.length - a.href.length)
-    .find((item) => request.nextUrl.pathname.startsWith(item.href));
-
-  const requiredRoles = navItem?.roles;
-
-  if (requiredRoles && requiredRoles.length > 0) {
-    const hasUserRoles = getHasUserRoles("", requiredRoles, userRoles);
-    if (!hasUserRoles) {
-      // If the user is logged in but lacks the role, send them to a 403 or Home
+  // 3. Check Strict Global Permissions (e.g., /admin)
+  const requiredGlobalPerm = siteConfig.routePermissions[pathname];
+  if (requiredGlobalPerm) {
+    if (!isLoggedIn || !hasPermission(claims, requiredGlobalPerm)) {
       const url = request.nextUrl.clone();
       url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page
       return NextResponse.redirect(url);
+    }
+  }
+
+  // 4. Check Dynamic Wildcard Routes (e.g., /gurus/*/edit)
+  for (const [routePattern, requiredBasePerm] of Object.entries(
+    siteConfig.dynamicRoutePermissions,
+  )) {
+    // Convert "/gurus/*/edit" to a Regex: "^/gurus/[^/]+/edit$"
+    const regexPattern = new RegExp(
+      "^" + routePattern.replace(/\*/g, "[^/]+") + "$",
+    );
+
+    if (regexPattern.test(pathname)) {
+      if (!isLoggedIn) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
+      // Check if they have the base capability
+      const hasBaseCapability = hasPermissionBase(
+        claims,
+        requiredBasePerm as PermissionBase,
+      );
+
+      if (!hasBaseCapability) {
+        return NextResponse.redirect(new URL("/403-forbidden", request.url));
+      }
+
+      // If they DO have the base capability, let them through!
+      // The Page component will do the final 'own' vs 'any' check using the resource DB row.
+      break;
     }
   }
 

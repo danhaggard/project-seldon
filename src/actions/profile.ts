@@ -3,18 +3,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { ProfileFormSchema, ProfileFormState } from "@/lib/definitions/profile";
 import { revalidatePath } from "next/cache";
+import { getClaims } from "@/lib/supabase/rbac";
 
 export async function updateProfile(
   state: ProfileFormState,
   formData: FormData,
 ): Promise<ProfileFormState> {
-  const supabase = await createClient();
+  const claims = await getClaims();
 
-  // 1. Get current user (secure check)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
+  if (!claims) {
     return { message: "You must be logged in to update your profile." };
   }
 
@@ -35,15 +32,19 @@ export async function updateProfile(
   }
 
   // 3. Update Database
-  const { error } = await supabase.from("profiles").upsert({
-    id: user.id,
-    full_name: validatedFields.data.fullName,
-    username: validatedFields.data.username,
-    website: validatedFields.data.website,
-    updated_at: new Date().toISOString(),
-  });
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      full_name: validatedFields.data.fullName,
+      username: validatedFields.data.username,
+      website: validatedFields.data.website,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", claims.sub); // Must explicitly match the row
 
   if (error) {
+    console.error(error);
     return { message: "Database Error: Failed to update profile." };
   }
 

@@ -1,55 +1,48 @@
 import Link, { LinkProps } from "next/link";
 import { siteConfig } from "@/config/site";
-import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { getHasUserRoles } from "@/lib/supabase/auth-helpers";
-import { AppRole } from "@/lib/definitions/auth";
+import { AppPermission, PermissionClaims } from "@/lib/definitions/rbac";
+import { getClaims, hasPermission } from "@/lib/supabase/rbac";
 
-interface SmartLinkProps extends LinkProps {
+interface SmartLinkProps extends Omit<LinkProps, "href"> {
+  href: string;
   children: React.ReactNode;
   className?: string;
-  isProtected?: boolean;
-  roles?: AppRole[];
+  requireAuth?: boolean;
+  requiredPermission?: AppPermission;
+  claims?: PermissionClaims | null;
 }
 
 export async function SmartLink({
   href,
   className,
   children,
-  isProtected: manualProtected,
-  roles: manualRoles,
+  requireAuth: manualRequireAuth,
+  requiredPermission: manualPermission,
+  claims: passedClaims,
   ...props
 }: SmartLinkProps) {
-  const supabase = await createClient();
+  // 1. Use the passed claims if they exist, otherwise fetch them (fallback)
+  let claims = passedClaims;
+  if (claims === undefined) {
+    claims = await getClaims();
+  }
 
-  // 1. Get the session to access the JWT claims
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const user = session?.user;
+  const isLoggedIn = !!claims?.sub;
 
   // 2. Resolve Config Rules
-  const configHref = typeof href === "string" ? href : null;
-  const configItem = configHref
-    ? siteConfig.nav.find((item) => item.href === configHref)
-    : null;
-
-  const requiresAuth = manualProtected ?? configItem?.protected ?? false;
-  const requiredRoles = manualRoles ?? configItem?.roles ?? [];
+  const configItem = siteConfig.nav.find((item) => item.href === href);
+  const requiresAuth = manualRequireAuth ?? configItem?.requireAuth ?? false;
+  const requiredPermission = manualPermission ?? configItem?.requiredPermission;
 
   // --- CHECK 1: AUTHENTICATION ---
-  if (requiresAuth && !user) {
+  if (requiresAuth && !isLoggedIn) {
     return null;
   }
 
-  // --- CHECK 2: RBAC (Role Based Access) ---
-  if (requiredRoles.length > 0) {
-    const hasUserRoles = getHasUserRoles(
-      session?.access_token || "",
-      requiredRoles,
-    );
-
-    if (!hasUserRoles) {
+  // --- CHECK 2: RBAC PERMISSIONS ---
+  if (requiredPermission) {
+    if (!hasPermission(claims, requiredPermission)) {
       return null;
     }
   }

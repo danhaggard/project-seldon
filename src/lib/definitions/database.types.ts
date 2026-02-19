@@ -402,7 +402,7 @@ export type Database = {
         }
         Insert: {
           id?: number
-          role: Database["public"]["Enums"]["app_role"]
+          role?: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
@@ -417,16 +417,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      authorize: {
-        Args: {
-          requested_permission: Database["public"]["Enums"]["app_permission"]
-        }
-        Returns: boolean
-      }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
     }
     Enums: {
-      app_permission: "gurus.delete" | "predictions.delete" | "users.manage"
+      app_permission:
+        | "gurus.create"
+        | "gurus.update.own"
+        | "gurus.update.any"
+        | "gurus.delete.own"
+        | "gurus.delete.any"
+        | "predictions.create"
+        | "predictions.update.own"
+        | "predictions.update.any"
+        | "predictions.delete.own"
+        | "predictions.delete.any"
+        | "comments.delete.any"
+        | "categories.manage"
+        | "users.manage"
       app_role: "admin" | "moderator" | "user"
       media_type: "text" | "video" | "audio" | "social"
       prediction_status:
@@ -568,7 +575,21 @@ export const Constants = {
   },
   public: {
     Enums: {
-      app_permission: ["gurus.delete", "predictions.delete", "users.manage"],
+      app_permission: [
+        "gurus.create",
+        "gurus.update.own",
+        "gurus.update.any",
+        "gurus.delete.own",
+        "gurus.delete.any",
+        "predictions.create",
+        "predictions.update.own",
+        "predictions.update.any",
+        "predictions.delete.own",
+        "predictions.delete.any",
+        "comments.delete.any",
+        "categories.manage",
+        "users.manage",
+      ],
       app_role: ["admin", "moderator", "user"],
       media_type: ["text", "video", "audio", "social"],
       prediction_status: [

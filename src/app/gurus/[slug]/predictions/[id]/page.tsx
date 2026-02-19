@@ -10,13 +10,13 @@ export default async function PredictionPage({
 }: {
   params: Promise<{ id: string; slug: string }>;
 }) {
-  const { id, slug } = await params; // <--- Await here as well
+  const { id, slug } = await params;
   const prediction = await getPredictionById(id);
 
   if (!prediction) notFound();
 
   return (
-    <div className="container max-w-2xl py-10">
+    <div className="container max-w-2xl">
       <Button
         variant="ghost"
         className="mb-6 pl-0 hover:bg-transparent hover:text-primary"

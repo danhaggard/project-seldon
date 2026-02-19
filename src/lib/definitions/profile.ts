@@ -1,4 +1,7 @@
 import * as z from "zod";
+import { Database } from "@/lib/definitions/database.types";
+
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 export const ProfileFormSchema = z.object({
   fullName: z.string().trim().nullable().optional(),

@@ -1,7 +1,8 @@
 "use server";
 
 import { PredictionSource } from "@/lib/definitions/prediction-source";
-import { getIsAdminModCreator } from "@/lib/supabase/auth-helpers";
+import { PERMISSION_BASE } from "@/lib/definitions/rbac";
+import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -53,14 +54,10 @@ export async function updatePrediction(
   state: UpdatePredictionFormState,
   formData: FormData,
 ): Promise<UpdatePredictionFormState> {
-  const supabase = await createClient();
+  const claims = await getClaims();
 
   // 1. Auth Check
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!claims) {
     return { message: "You must be logged in to update a prediction." };
   }
 
@@ -88,30 +85,30 @@ export async function updatePrediction(
     };
   }
 
-  let submittedSources: Partial<PredictionSource>[] = [];
-
-  try {
-    submittedSources = JSON.parse(validated.data?.sources_json || "");
-  } catch (e) {
-    return { message: "Invalid sources data" };
-  }
-
   // 3. Permission Check
   // Fetch prediction to check creator
+  const supabase = await createClient();
   const { data: prediction } = await supabase
     .from("predictions")
     .select("created_by")
     .eq("id", validated.data.id)
     .single();
 
-  const canEdit = await getIsAdminModCreator(prediction?.created_by);
-  if (!canEdit) {
+  if (!prediction) {
+    return { message: "Prediction not found. It may have been deleted." };
+  }
+
+  const { isPermitted } = await checkPermission(
+    PERMISSION_BASE.PREDICTIONS_UPDATE,
+    prediction?.created_by,
+    claims,
+  );
+
+  if (!isPermitted) {
     return { message: "You do not have permission to edit this prediction." };
   }
 
   // 4. Update Database
-  // Note: We handle the primary source URL update here for simplicity.
-  // Ideally, source management might be a separate array operation, but we'll update the first one or just the prediction fields for now.
   const { error: predError } = await supabase
     .from("predictions")
     .update({
@@ -121,9 +118,6 @@ export async function updatePrediction(
       resolution_window_end: validated.data.resolution_window_end,
       confidence_level: validated.data.confidence_level,
       status: validated.data.status, // Cast because Zod enum vs DB enum
-      // For V2, we might not have source_url on the prediction table anymore depending on your specific migration.
-      // If you moved it to a separate table, remove this line or handle the relation update separately.
-      // Assuming legacy support or a view:
     })
     .eq("id", validated.data.id);
 
@@ -132,6 +126,13 @@ export async function updatePrediction(
   }
 
   // 3. Handle Sources (The "Diffing" Logic)
+  let submittedSources: Partial<PredictionSource>[] = [];
+
+  try {
+    submittedSources = JSON.parse(validated.data?.sources_json || "");
+  } catch {
+    return { message: "Invalid sources data" };
+  }
 
   // A. Fetch current DB sources to find deletions
   const { data: currentDbSources } = await supabase
