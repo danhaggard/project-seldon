@@ -77,6 +77,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
                       rel="noreferrer"
                     >
                       <Twitter className="w-4 h-4" />
+                      <span className="sr-only">Twitter profile</span>
                     </a>
                   </Button>
                 )}
@@ -93,6 +94,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
                       rel="noreferrer"
                     >
                       <Youtube className="w-4 h-4" />
+                      <span className="sr-only">YouTube channel</span>
                     </a>
                   </Button>
                 )}
@@ -105,6 +107,7 @@ export async function GuruHeader({ slug }: { slug: string }) {
                   >
                     <a href={guru.website} target="_blank" rel="noreferrer">
                       <Globe className="w-4 h-4" />
+                      <span className="sr-only">Personal website</span>
                     </a>
                   </Button>
                 )}
