@@ -13,6 +13,7 @@ import {
   FormGroup,
   FormError,
   FormFieldDescription,
+  FormAlert,
 } from "@/components/layout/form-card";
 import Link from "next/link";
 import { Guru } from "@/lib/definitions/guru";
@@ -21,7 +22,7 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
   const [state, action, isPending] = useActionState(updateGuru, undefined);
 
   return (
-    <form action={action} className="space-y-6 max-w-2xl">
+    <form action={action} className="space-y-6 max-w-2xl" aria-busy={isPending}>
       <FormCard
         className="border-none py-0 shadow-none"
         title={<h1>Edit Guru</h1>}
@@ -41,8 +42,9 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               defaultValue={guru.name}
               disabled
               className="bg-muted text-muted-foreground cursor-not-allowed"
+              aria-describedby="nameDescription"
             />
-            <FormFieldDescription>
+            <FormFieldDescription id="nameDescription">
               Names cannot be changed to preserve URL structure.
             </FormFieldDescription>
           </FormGroup>
@@ -57,6 +59,7 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               rows={4}
               className={cn(state?.errors?.bio && "border-red-500")}
               aria-describedby="bioError"
+              aria-invalid={!!state?.errors?.bio}
             />
             <FormError id="bioError" errors={state?.errors?.bio} />
           </FormGroup>
@@ -75,6 +78,7 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 }
                 className={cn("rounded-l-none", state?.errors?.twitter_handle && "border-red-500")}
                 aria-describedby="twitterHandleError"
+                aria-invalid={!!state?.errors?.twitter_handle}
               />
             </div>
             <FormError id="twitterHandleError" errors={state?.errors?.twitter_handle} />
@@ -94,6 +98,7 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 }
                 className={cn("rounded-l-none", state?.errors?.youtube_channel && "border-red-500")}
                 aria-describedby="youtubeChannelError"
+                aria-invalid={!!state?.errors?.youtube_channel}
               />
             </div>
             <FormError id="youtubeChannelError" errors={state?.errors?.youtube_channel} />
@@ -109,14 +114,13 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
               defaultValue={state?.inputs?.website || guru.website || ""}
               className={cn(state?.errors?.website && "border-red-500")}
               aria-describedby="websiteError"
+              aria-invalid={!!state?.errors?.website}
             />
             <FormError id="websiteError" errors={state?.errors?.website} />
           </FormGroup>
 
           {/* Global Error Message */}
-          {state?.message && (
-            <p className="text-sm text-red-500 font-medium">{state.message}</p>
-          )}
+          <FormAlert message={state?.message} />
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>

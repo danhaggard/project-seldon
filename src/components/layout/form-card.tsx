@@ -95,13 +95,32 @@ export function FormError({
 export function FormFieldDescription({
   children,
   className,
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
-    <p className={cn("text-xs text-muted-foreground", className)}>
+    <p id={id} className={cn("text-xs text-muted-foreground", className)}>
       {children}
+    </p>
+  );
+}
+
+// 6. A global form alert/error message
+export function FormAlert({
+  message,
+  className,
+}: {
+  message?: string | null;
+  className?: string;
+}) {
+  if (!message) return null;
+
+  return (
+    <p className={cn("text-sm text-red-500 font-medium", className)} role="alert">
+      {message}
     </p>
   );
 }

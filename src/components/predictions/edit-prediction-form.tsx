@@ -18,14 +18,13 @@ import {
   FormContent,
   FormGroup,
 } from "@/components/layout/form-card";
-import { Database } from "@/lib/definitions/database.types";
 import { format } from "date-fns";
 import { SourceManager } from "./source-manager";
 import { useState } from "react";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
 import Link from "next/link";
+import { Category } from "@/lib/definitions/category";
 
-type Category = Database["public"]["Tables"]["categories"]["Row"];
 
 interface EditPredictionFormProps {
   prediction: PredictionByIdWithSources;

@@ -1,6 +1,7 @@
 "use client";
 
 import { createGuru } from "@/actions/guru";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +11,9 @@ import {
   FormCard,
   FormContent,
   FormGroup,
+  FormError,
+  FormFieldDescription,
+  FormAlert,
 } from "@/components/layout/form-card";
 import Link from "next/link";
 
@@ -17,7 +21,7 @@ export function CreateGuruForm() {
   const [state, action, isPending] = useActionState(createGuru, undefined);
 
   return (
-    <form action={action} className="space-y-6 max-w-2xl">
+    <form action={action} className="space-y-6 max-w-2xl" aria-busy={isPending}>
       <FormCard
         className="border-none py-0 shadow-none"
         title={<h1>Add a New Guru</h1>}
@@ -32,13 +36,14 @@ export function CreateGuruForm() {
               placeholder="e.g. Cathie Wood"
               defaultValue={state?.inputs?.name || ""}
               required
+              className={cn(state?.errors?.name && "border-red-500")}
+              aria-describedby="nameError nameDescription"
+              aria-invalid={!!state?.errors?.name}
             />
-            {state?.errors?.name && (
-              <p className="text-sm text-red-500">{state.errors.name[0]}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
+            <FormError id="nameError" errors={state?.errors?.name} />
+            <FormFieldDescription id="nameDescription">
               This will automatically generate their URL slug.
-            </p>
+            </FormFieldDescription>
           </FormGroup>
 
           <FormGroup>
@@ -49,10 +54,11 @@ export function CreateGuruForm() {
               placeholder="A brief description of who they are and what they predict..."
               defaultValue={state?.inputs?.bio || ""}
               rows={4}
+              className={cn(state?.errors?.bio && "border-red-500")}
+              aria-describedby="bioError"
+              aria-invalid={!!state?.errors?.bio}
             />
-            {state?.errors?.bio && (
-              <p className="text-sm text-red-500">{state.errors.bio[0]}</p>
-            )}
+            <FormError id="bioError" errors={state?.errors?.bio} />
           </FormGroup>
 
           <FormGroup>
@@ -66,14 +72,12 @@ export function CreateGuruForm() {
                 name="twitter_handle"
                 placeholder="CathieDWood"
                 defaultValue={state?.inputs?.twitter_handle || ""}
-                className="rounded-l-none"
+                className={cn("rounded-l-none", state?.errors?.twitter_handle && "border-red-500")}
+                aria-describedby="twitterHandleError"
+                aria-invalid={!!state?.errors?.twitter_handle}
               />
             </div>
-            {state?.errors?.twitter_handle && (
-              <p className="text-sm text-red-500">
-                {state.errors.twitter_handle[0]}
-              </p>
-            )}
+            <FormError id="twitterHandleError" errors={state?.errors?.twitter_handle} />
           </FormGroup>
 
           <FormGroup>
@@ -87,14 +91,12 @@ export function CreateGuruForm() {
                 name="youtube_channel"
                 placeholder="ARKInvest"
                 defaultValue={state?.inputs?.youtube_channel || ""}
-                className="rounded-l-none"
+                className={cn("rounded-l-none", state?.errors?.youtube_channel && "border-red-500")}
+                aria-describedby="youtubeChannelError"
+                aria-invalid={!!state?.errors?.youtube_channel}
               />
             </div>
-            {state?.errors?.youtube_channel && (
-              <p className="text-sm text-red-500">
-                {state.errors.youtube_channel[0]}
-              </p>
-            )}
+            <FormError id="youtubeChannelError" errors={state?.errors?.youtube_channel} />
           </FormGroup>
 
           <FormGroup>
@@ -105,16 +107,15 @@ export function CreateGuruForm() {
               type="url"
               placeholder="https://ark-invest.com"
               defaultValue={state?.inputs?.website || ""}
+              className={cn(state?.errors?.website && "border-red-500")}
+              aria-describedby="websiteError"
+              aria-invalid={!!state?.errors?.website}
             />
-            {state?.errors?.website && (
-              <p className="text-sm text-red-500">{state.errors.website[0]}</p>
-            )}
+            <FormError id="websiteError" errors={state?.errors?.website} />
           </FormGroup>
 
           {/* Global Error Message */}
-          {state?.message && (
-            <p className="text-sm text-red-500 font-medium">{state.message}</p>
-          )}
+          <FormAlert message={state?.message} />
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>
