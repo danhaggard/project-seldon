@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "db-push": "pnpm supabase db push",
+    "db-reset": "pnpm supabase db reset",
+    "db-up": "pnpm supabase migration up",
     "update-types": "supabase gen types typescript --project-id 'kujvwymnzvlrqjvgrlyz' > src/lib/definitions/database.types.ts",
     "update-types-local": "supabase gen types typescript --local > src/lib/definitions/database.types.ts"
   },
