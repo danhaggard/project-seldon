@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import { AuthButton, AuthButtonSkeleton } from "@/components/auth/auth-button";
 import { Toaster } from "@/components/ui/sonner";
+import { MobileSheet } from "@/components/layout/mobile-sheet";
 
 import "./globals.css";
 
@@ -58,20 +59,9 @@ export default function RootLayout({
               <div className="max-w-360 mx-auto flex h-14 items-center gap-4 px-4">
                 {/* Mobile Hamburger (Visible only on small screens) */}
                 <div className="lg:hidden">
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="ghost" size="icon" aria-label="Site Menu">
-                        <Menu className="h-5 w-5" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="w-64 p-0">
-                      {/* Dialog title for screen readers only */}
-                      <SheetTitle className="sr-only">
-                        Navigation Menu
-                      </SheetTitle>
-                      <SidebarContent />
-                    </SheetContent>
-                  </Sheet>
+                  <MobileSheet>
+                    <SidebarContent />
+                  </MobileSheet>
                 </div>
 
                 <div className="font-bold text-xl tracking-tighter">
