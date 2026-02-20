@@ -19,15 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Trash2,
-  Plus,
-  Link as LinkIcon,
-  FileText,
-  Video,
-  Mic,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Trash2, Plus, Link as LinkIcon } from "lucide-react";
 import {
   PREDICTION_SOURCE_MEDIA_TYPE,
   PREDICTION_SOURCE_STATUS,
@@ -36,14 +28,16 @@ import {
   PredictionSourceStatuses,
   PredictionSourceTypes,
 } from "@/lib/definitions/prediction-source";
-import { capitalize } from "@/lib/utils";
+import { capitalize, cn } from "@/lib/utils";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
+import { getMediaBadgeClassName, getMediaIcon } from "@/config/getters";
 
 type PredictionSource = PredictionByIdWithSources["prediction_sources"][number];
 
 type Source = Partial<PredictionSource> & {
   // We need a temp ID for UI keys before it's saved to DB
   id?: string;
+  title?: string | null;
 };
 
 interface SourceManagerProps {
@@ -60,6 +54,7 @@ export function SourceManager({
 
   // Modal Form State
   const [newUrl, setNewUrl] = useState("");
+  const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState<PredictionSourceTypes>(
     PREDICTION_SOURCE_TYPE.SECONDARY,
   );
@@ -78,10 +73,19 @@ export function SourceManager({
 
   const handleAddSource = () => {
     if (!newUrl) return;
+    // Helper to grab domain root for the UI before it hits the server
+    const getTempDomain = (urlString: string) => {
+      try {
+        return new URL(urlString).hostname.replace(/^www\./, "");
+      } catch {
+        return urlString;
+      }
+    };
 
     const newSource: Partial<Source> = {
       id: `temp-${Date.now()}`, // Temporary ID
       url: newUrl,
+      title: (newTitle && newTitle.trim()) || getTempDomain(newUrl),
       type: newType,
       status: newStatus,
       media_type: newMediaType,
@@ -93,18 +97,8 @@ export function SourceManager({
 
     // Reset and Close
     setNewUrl("");
+    setNewTitle("");
     setIsModalOpen(false);
-  };
-
-  const getMediaIcon = (type: string = "text") => {
-    switch (type) {
-      case "video":
-        return <Video className="w-3 h-3" />;
-      case "audio":
-        return <Mic className="w-3 h-3" />;
-      default:
-        return <FileText className="w-3 h-3" />;
-    }
   };
 
   return (
@@ -123,6 +117,17 @@ export function SourceManager({
               <DialogTitle>Add Evidence Source</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
+              {/* Title Input */}
+              <div className="grid gap-2">
+                <Label htmlFor="title">Title (Optional)</Label>
+                <Input
+                  id="title"
+                  placeholder="Auto-extracted from URL if left blank"
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                />
+              </div>
+
               <div className="grid gap-2">
                 <Label htmlFor="url">URL</Label>
                 <Input
@@ -198,41 +203,74 @@ export function SourceManager({
           </div>
         )}
 
-        {sources.map((source) => (
+        {sources.map((source, idx) => (
           <div
-            key={source.id}
-            className="flex items-center justify-between p-3 rounded-md border bg-card"
+            key={source.id || idx}
+            className="flex items-center justify-between p-3 rounded-lg border bg-card shadow-sm gap-3 transition-colors hover:bg-muted/10"
           >
-            <div className="flex flex-col gap-1 overflow-hidden">
+            {/* LEFT SIDE: Content Stack */}
+            <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+              {/* Top Row: Metadata & Title */}
               <div className="flex items-center gap-2">
-                <Badge
-                  variant={source.type === "primary" ? "default" : "secondary"}
-                  className="text-[10px] h-5 px-1.5 uppercase"
+                {/* 1. Colored Media Badge */}
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5 px-2 py-1 rounded-md font-medium text-xs shrink-0 border border-transparent",
+                    getMediaBadgeClassName(source.media_type),
+                  )}
                 >
-                  {source.type}
-                </Badge>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                  {getMediaIcon(source.media_type)}
+                  {getMediaIcon(source.media_type, "w-3.5 h-3.5")}
                   <span className="capitalize">{source.media_type}</span>
                 </div>
+
+                {/* 2. Primary/Secondary Tag */}
+                <div className="flex items-center gap-2 text-muted-foreground shrink-0">
+                  <span className="uppercase tracking-wider font-semibold text-[10px]">
+                    {source.type}
+                  </span>
+                  <span className="text-border text-[10px] hidden sm:inline-block">
+                    •
+                  </span>
+                </div>
+
+                {/* 3. Title */}
+                <span
+                  className="font-medium text-sm truncate text-foreground/90 hidden sm:inline-block"
+                  title={source.title || source.url}
+                >
+                  {source.title || "Pending Extraction..."}
+                </span>
               </div>
+
+              {/* Mobile Fallback Title (Shows under badges on tiny screens) */}
+              <span
+                className="font-medium text-sm truncate text-foreground/90 sm:hidden"
+                title={source.title || source.url}
+              >
+                {source.title || "Pending Extraction..."}
+              </span>
+
+              {/* Bottom Row: URL */}
               <a
                 href={source.url}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm truncate hover:underline flex items-center gap-1 text-primary"
+                className="text-xs truncate hover:underline flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-primary"
+                title={source.url}
               >
-                <LinkIcon className="w-3 h-3 shrink-0" />
+                <LinkIcon className="w-3.5 h-3.5 shrink-0" />
                 {source.url}
               </a>
             </div>
 
+            {/* RIGHT SIDE: Delete Action */}
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-destructive"
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 h-8 w-8"
               onClick={() => (source.id ? handleDelete(source.id) : undefined)}
+              title="Remove Source"
             >
               <Trash2 className="w-4 h-4" />
             </Button>

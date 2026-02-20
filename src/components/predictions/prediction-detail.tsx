@@ -1,7 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
-  ExternalLink,
   Calendar,
   CheckCircle2,
   XCircle,
@@ -18,9 +16,11 @@ import {
 } from "@/lib/definitions/prediction";
 import Link from "next/link";
 import { Suspense } from "react";
-import { EditPredictionDetailsButton } from "@/app/gurus/[slug]/predictions/[id]/edit/_components/edit-prediction-details-button";
+import { EditPredictionDetailsButton } from "@/app/(main)/gurus/[slug]/predictions/[id]/edit/_components/edit-prediction-details-button";
 import { routes } from "@/config/routes";
-
+import { getMediaBadgeClassName, getMediaIcon } from "@/config/getters";
+import { cn } from "@/lib/utils";
+import { SourceValidationControls } from "./source-validation-controls";
 
 export function PredictionDetail({
   prediction,
@@ -70,7 +70,10 @@ export function PredictionDetail({
 
           <span className="text-sm text-muted-foreground">
             Prediction by{" "}
-            <Link href={routes.gurus.detail(prediction.gurus?.slug || '')} scroll={false}>
+            <Link
+              href={routes.gurus.detail(prediction.gurus?.slug || "")}
+              scroll={false}
+            >
               <span className="font-medium text-foreground">{guru?.name}</span>
             </Link>
           </span>
@@ -139,32 +142,58 @@ export function PredictionDetail({
         </div>
       )}
 
-      {/* V2: Sources List (Handling multiple sources) */}
       {prediction.prediction_sources &&
         prediction.prediction_sources.length > 0 && (
-          <div className="pt-2">
-            <h3 className="font-semibold mb-3 flex items-center gap-2">
+          <div className="pt-4 mt-4 border-t border-border/50">
+            <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm text-foreground/80">
               <LinkIcon className="w-4 h-4" /> Sources & Evidence
             </h3>
             <div className="space-y-2">
               {prediction.prediction_sources.map((source, idx) => (
                 <div
-                  key={idx}
-                  className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded border"
+                  key={source.id || idx}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between text-sm p-3 bg-card rounded-lg border shadow-sm gap-3 transition-colors hover:bg-muted/10"
                 >
-                  <span className="text-muted-foreground capitalize truncate max-w-50 sm:max-w-xs">
-                    {source.type} Source
-                  </span>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="h-auto p-0"
-                    asChild
-                  >
-                    <a href={source.url} target="_blank" rel="noreferrer">
-                      Open Link <ExternalLink className="ml-1 w-3 h-3" />
-                    </a>
-                  </Button>
+                  {/* LEFT SIDE: Clean Metadata and Title */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {/* 1. Colored Media Badge */}
+                    <div
+                      className={cn(
+                        "flex items-center gap-1.5 px-2 py-1 rounded-md font-medium text-xs shrink-0 border border-transparent",
+                        getMediaBadgeClassName(source.media_type),
+                      )}
+                    >
+                      {/* Pass custom sizing, color inherits from the wrapper */}
+                      {getMediaIcon(source.media_type, "w-3.5 h-3.5")}
+                      <span className="capitalize">{source.media_type}</span>
+                    </div>
+
+                    {/* 2. Primary/Secondary Tag (Demoted to clean text) */}
+                    <div className="hidden sm:flex items-center gap-2 text-muted-foreground shrink-0">
+                      <span className="uppercase tracking-wider font-semibold text-[10px]">
+                        {source.type}
+                      </span>
+                      <span className="text-border text-[10px]">•</span>
+                    </div>
+
+                    {/* 3. Title */}
+                    <span
+                      className="font-medium truncate text-foreground/90"
+                      title={source.title || source.url}
+                    >
+                      {source.title || source.url}
+                    </span>
+                  </div>
+
+                  {/* RIGHT SIDE: The new component! */}
+                  <SourceValidationControls
+                    sourceId={source.id}
+                    url={source.url}
+                    initialUpvotes={source.upvotes_count}
+                    initialDownvotes={source.downvotes_count}
+                    initialUserVote={source.user_vote}
+                    isOwner={source.is_owner}
+                  />
                 </div>
               ))}
             </div>

@@ -8,8 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "update-types": "supabase gen types typescript --project-id 'kujvwymnzvlrqjvgrlyz' > src/lib/definitions/database.types.ts",
-    "update-types-local": "supabase gen types typescript --local > src/lib/definitions/database.types.ts"
+    "db-push": "pnpm supabase db push",
+    "db-reset": "pnpm supabase db reset",
+    "db-up": "pnpm supabase migration up",
+    "update-types": "pnpm supabase gen types typescript --project-id 'kujvwymnzvlrqjvgrlyz' > src/lib/definitions/database.types.ts",
+    "update-types-local": "pnpm supabase gen types typescript --local > src/lib/definitions/database.types.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
