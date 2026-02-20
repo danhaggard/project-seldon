@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { GuruHeader } from "@/app/gurus/[slug]/_components/guru-header";
+import { GuruHeader } from "@/app/(main)/gurus/[slug]/_components/guru-header";
 import { PredictionFeedContainer } from "@/components/predictions/prediction-feed-container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SectionErrorBoundary } from "@/components/ui/section-error-boundary";
@@ -37,7 +37,7 @@ export default async function GuruDetailPage({
   const tab = (resolvedSearchParams.tab as "pending" | "history") || "pending";
 
   return (
-    <div className="container space-y-8">
+    <article className="container space-y-8">
       <GuruToastListener />
       {/* 1. Header Section */}
       {/* If this fails, we show a red error box where the header should be */}
@@ -53,6 +53,6 @@ export default async function GuruDetailPage({
           <PredictionFeedContainer slug={slug} page={page} tab={tab} />
         </Suspense>
       </SectionErrorBoundary>
-    </div>
+    </article>
   );
 }

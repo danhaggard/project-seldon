@@ -193,34 +193,43 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
+          downvotes_count: number
           id: string
           manual_archive_url: string | null
           media_type: Database["public"]["Enums"]["media_type"]
           prediction_id: string
           status: Database["public"]["Enums"]["source_status"]
+          title: string | null
           type: Database["public"]["Enums"]["source_type"]
+          upvotes_count: number
           url: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
+          downvotes_count?: number
           id?: string
           manual_archive_url?: string | null
           media_type?: Database["public"]["Enums"]["media_type"]
           prediction_id: string
           status?: Database["public"]["Enums"]["source_status"]
+          title?: string | null
           type?: Database["public"]["Enums"]["source_type"]
+          upvotes_count?: number
           url: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
+          downvotes_count?: number
           id?: string
           manual_archive_url?: string | null
           media_type?: Database["public"]["Enums"]["media_type"]
           prediction_id?: string
           status?: Database["public"]["Enums"]["source_status"]
+          title?: string | null
           type?: Database["public"]["Enums"]["source_type"]
+          upvotes_count?: number
           url?: string
         }
         Relationships: [
@@ -393,6 +402,41 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
+      }
+      source_validations: {
+        Row: {
+          created_at: string
+          id: string
+          is_valid: boolean
+          source_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_valid: boolean
+          source_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          source_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_validations_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "prediction_sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

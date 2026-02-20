@@ -22,7 +22,7 @@ import {
   FormAlert,
 } from "@/components/layout/form-card";
 import { format } from "date-fns";
-import { SourceManager } from "../../../../../../../components/predictions/source-manager";
+import { SourceManager } from "../../../../../../../../components/predictions/source-manager";
 import { useState } from "react";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
 import Link from "next/link";

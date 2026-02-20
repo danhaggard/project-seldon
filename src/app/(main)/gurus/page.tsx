@@ -20,7 +20,7 @@ export default async function GurusListPage() {
     .select("*")
     .order("credibility_score", { ascending: false });
 
-    const gurus = data as Guru[]
+  const gurus = data as Guru[];
 
   if (!gurus || gurus.length === 0) {
     return (
@@ -67,41 +67,46 @@ export default async function GurusListPage() {
             href={routes.gurus.detail(guru.slug)}
             className="block group"
           >
-            <Card className="h-full hover:shadow-md transition-shadow duration-200">
-              <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                <Avatar className="h-12 w-12 border bg-muted">
-                  <AvatarImage
-                    src={guru.avatar_url || ""}
-                    alt={guru.name}
-                    className="object-cover"
-                  />
-                  <AvatarFallback>{guru.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="group-hover:text-primary transition-colors">
-                    {guru.name}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    Score:{" "}
-                    <span
-                      className={
-                        (guru.credibility_score ?? 0) >= 60
-                          ? "text-green-600"
-                          : (guru.credibility_score ?? 0) >= 40
-                            ? "text-yellow-600"
-                            : "text-red-600"
-                      }
-                    >
-                      {guru.credibility_score ?? "N/A"}
-                    </span>
+            <Card
+              asChild
+              className="h-full hover:shadow-md transition-shadow duration-200"
+            >
+              <article>
+                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                  <Avatar className="h-12 w-12 border bg-muted">
+                    <AvatarImage
+                      src={guru.avatar_url || ""}
+                      alt={guru.name}
+                      className="object-cover"
+                    />
+                    <AvatarFallback>{guru.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="group-hover:text-primary transition-colors">
+                      {guru.name}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground font-medium">
+                      Score:{" "}
+                      <span
+                        className={
+                          (guru.credibility_score ?? 0) >= 60
+                            ? "text-green-600"
+                            : (guru.credibility_score ?? 0) >= 40
+                              ? "text-yellow-600"
+                              : "text-red-600"
+                        }
+                      >
+                        {guru.credibility_score ?? "N/A"}
+                      </span>
+                    </p>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {guru.bio || "No biography available."}
                   </p>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {guru.bio || "No biography available."}
-                </p>
-              </CardContent>
+                </CardContent>
+              </article>
             </Card>
           </Link>
         ))}

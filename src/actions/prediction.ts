@@ -9,7 +9,6 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { routes } from "@/config/routes";
 
-
 const CommonPredictionSchema = {
   guru_slug: z.string(), // Needed for redirect
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -31,6 +30,17 @@ const UpdatePredictionSchema = z.object({
   id: z.uuid(),
   ...CommonPredictionSchema,
 });
+
+// Helper to extract clean domain name
+function getDomainRoot(urlString: string | undefined | null): string {
+  if (!urlString) return "Unknown Source";
+  try {
+    const url = new URL(urlString);
+    return url.hostname.replace(/^www\./, "");
+  } catch (e) {
+    return urlString; // Fallback to raw string if parsing fails
+  }
+}
 
 export type UpdatePredictionFormState =
   | {
@@ -168,6 +178,7 @@ export async function updatePrediction(
   const sourcesToInsert = submittedSourcesToInsert.map((s) => ({
     prediction_id: validated.data.id,
     url: s.url,
+    title: s.title?.trim() ? s.title.trim() : getDomainRoot(s.url),
     type: s.type,
     status: s.status,
     media_type: s.media_type,
@@ -177,6 +188,7 @@ export async function updatePrediction(
   const sourcesToUpdate = submittedSourcesToUpdate.map((s) => ({
     id: s.id, // Keep the ID for updates
     prediction_id: validated.data.id,
+    title: s.title?.trim() ? s.title.trim() : getDomainRoot(s.url), // <-- ADD THIS
     url: s.url,
     type: s.type,
     status: s.status,
@@ -206,7 +218,10 @@ export async function updatePrediction(
   }
 
   // 5. Redirect
-  const predictionPath = routes.gurus.predictionDetail(validated.data.guru_slug, validated.data.id);
+  const predictionPath = routes.gurus.predictionDetail(
+    validated.data.guru_slug,
+    validated.data.id,
+  );
   revalidatePath(predictionPath);
   redirect(`${predictionPath}?status=updated`);
 }
@@ -331,6 +346,7 @@ export async function createPrediction(
     const sourcesToInsert = submittedSources.map((s) => ({
       prediction_id: newPrediction.id, // Link to the newly created row
       url: s.url,
+      title: s.title?.trim() ? s.title.trim() : getDomainRoot(s.url), // <-- ADD THIS
       type: s.type,
       status: s.status,
       media_type: s.media_type,
