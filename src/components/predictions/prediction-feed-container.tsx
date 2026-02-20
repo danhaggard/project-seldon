@@ -3,10 +3,6 @@ import { PredictionCard } from "./prediction-card";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { getPredictionsByGuruSlug } from "@/lib/data/gurus";
 import { cn } from "@/lib/utils";
-import { SmartLink } from "@/components/ui/smart-link";
-import { APP_PERMISSION } from "@/lib/definitions/rbac";
-import { buttonVariants } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { routes } from "@/config/routes";
 
 interface Props {
@@ -62,17 +58,6 @@ export async function PredictionFeedContainer({
             Prediction History
           </Link>
         </nav>
-
-        {/* Add Prediction Button */}
-        <div className="pb-1">
-          <SmartLink
-            href={routes.gurus.addPrediction(slug)}
-            requiredPermission={APP_PERMISSION.PREDICTIONS_CREATE}
-            className={buttonVariants({ variant: "default", size: "sm" })}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Add Prediction
-          </SmartLink>
-        </div>
       </div>
 
       {/* --- List of Cards --- */}

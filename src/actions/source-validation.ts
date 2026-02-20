@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { unauthorized, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { getClaims } from "@/lib/supabase/rbac";
 
@@ -28,7 +29,7 @@ export async function castValidationVote(
   const claims = await getClaims();
 
   if (!claims) {
-    return { error: "You must be logged in to validate sources." };
+    unauthorized();
   }
 
   try {
@@ -84,6 +85,7 @@ export async function castValidationVote(
     revalidatePath(validated.data.pathname);
     return { success: true };
   } catch (error: unknown) {
+    unstable_rethrow(error);
     console.error("Validation Vote Error:", error);
     return { error: "Failed to register validation. Please try again." };
   }
