@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { PredictionCard } from "./prediction-card";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { getPredictionsByGuruSlug } from "@/lib/data/gurus";
-import { cn } from "@/lib/utils";
 import { routes } from "@/config/routes";
 
 interface Props {
@@ -29,37 +27,6 @@ export async function PredictionFeedContainer({
 
   return (
     <div className="space-y-6">
-      {/* --- Tabs & Actions Bar --- */}
-      <div className="border-b flex items-center justify-between">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-          <Link
-            href={`?tab=pending`}
-            scroll={false}
-            className={cn(
-              "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors",
-              isPendingTab
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300",
-            )}
-          >
-            Pending Predictions
-          </Link>
-
-          <Link
-            href={`?tab=history`}
-            scroll={false}
-            className={cn(
-              "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors",
-              !isPendingTab
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300",
-            )}
-          >
-            Prediction History
-          </Link>
-        </nav>
-      </div>
-
       {/* --- List of Cards --- */}
       <div className="space-y-4">
         {predictions.length > 0 ? (

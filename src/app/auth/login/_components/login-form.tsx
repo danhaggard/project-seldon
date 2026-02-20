@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { login } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,13 +19,25 @@ import { routes } from "@/config/routes";
 
 export function LoginForm({
   className,
+  isModal = false,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & { isModal?: boolean }) {
+  const router = useRouter();
   const [state, action, isPending] = useActionState(login, undefined);
+
+  useEffect(() => {
+    if (state?.success) {
+      // 1. Close the modal by popping the intercepted route
+      router.back();
+      // 2. Refresh the underlying page to update the AuthButton state
+      router.refresh();
+    }
+  }, [state?.success, router]);
 
   return (
     <div className={className} {...props}>
       <form action={action} aria-busy={isPending}>
+        {isModal && <input type="hidden" name="isModal" value="true" />}
         <FormCard
           title={<h1>Login</h1>}
           description={<p>Enter your email below to login to your account</p>}
@@ -70,11 +83,11 @@ export function LoginForm({
                   Forgot your password?
                 </Link>
               </div>
-              <Input 
-                id="password" 
-                name="password" 
-                type="password" 
-                required 
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
                 autoComplete="current-password"
                 className={cn(state?.errors?.password && "border-red-500")}
                 aria-invalid={!!state?.errors?.password}
