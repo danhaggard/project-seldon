@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { signup, checkUsername } from "@/actions/auth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   FormFieldDescription
 } from "@/components/layout/form-card";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { routes } from "@/config/routes";
 
 export function SignUpForm({
   className,
@@ -73,7 +74,7 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
             <div className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
-                href="/auth/login"
+                href={routes.auth.login}
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Login

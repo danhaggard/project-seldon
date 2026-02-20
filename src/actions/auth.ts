@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import * as z from "zod";
 import { redirect } from "next/navigation";
+import { routes } from "@/config/routes";
 
 const ForgotPasswordSchema = z.object({
   email: z.email({ message: "Please enter a valid email." }),
@@ -41,7 +42,7 @@ export async function forgotPassword(
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     // This redirects them to the page where they type their NEW password
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/update-password`,
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${routes.auth.updatePassword}`,
   });
 
   if (error) {
@@ -110,7 +111,7 @@ export async function login(
   }
 
   // 3. Success!
-  redirect("/");
+  redirect(routes.home);
 }
 
 export async function checkUsername(username: string): Promise<boolean> {
@@ -210,7 +211,7 @@ export async function signup(
       data: {
         username,
       },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}${routes.auth.callback}`,
     },
   });
 
@@ -227,7 +228,7 @@ export async function signup(
   // 5. Success! Redirect the user
   // Note: We throw redirect outside the try/catch block usually, but here
   // we are at the end of the function so it's safe.
-  redirect("/auth/sign-up-success");
+  redirect(routes.auth.signUpSuccess);
 }
 
 export async function signout() {
@@ -235,7 +236,7 @@ export async function signout() {
   await supabase.auth.signOut();
 
   // Redirecting from a Server Action automatically invalidates the cache
-  redirect("/auth/login");
+  redirect(routes.auth.login);
 }
 
  const UpdatePasswordSchema = z
@@ -301,5 +302,5 @@ export async function updatePassword(
     };
   }
 
-  redirect("/protected");
+  redirect(routes.protected);
 }

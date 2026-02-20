@@ -4,6 +4,7 @@ import { hasEnvVars } from "../utils";
 import { siteConfig } from "@/config/site";
 import { hasPermission, hasPermissionBase } from "./rbac";
 import { PermissionBase } from "../definitions/rbac";
+import { routes } from "@/config/routes";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -57,7 +58,7 @@ export async function updateSession(request: NextRequest) {
   const requiresAuth = siteConfig.authRequiredPaths().includes(pathname);
   if (requiresAuth && !isLoggedIn) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
+    url.pathname = routes.auth.login;
     return NextResponse.redirect(url);
   }
 
@@ -66,7 +67,7 @@ export async function updateSession(request: NextRequest) {
   if (requiredGlobalPerm) {
     if (!isLoggedIn || !hasPermission(claims, requiredGlobalPerm)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/403-forbidden"; // Or "/403-forbidden" if you have that page
+      url.pathname = routes.forbidden;
       return NextResponse.redirect(url);
     }
   }
@@ -82,7 +83,7 @@ export async function updateSession(request: NextRequest) {
 
     if (regexPattern.test(pathname)) {
       if (!isLoggedIn) {
-        return NextResponse.redirect(new URL("/", request.url));
+        return NextResponse.redirect(new URL(routes.home, request.url));
       }
 
       // Check if they have the base capability
@@ -92,7 +93,7 @@ export async function updateSession(request: NextRequest) {
       );
 
       if (!hasBaseCapability) {
-        return NextResponse.redirect(new URL("/403-forbidden", request.url));
+        return NextResponse.redirect(new URL(routes.forbidden, request.url));
       }
 
       // If they DO have the base capability, let them through!

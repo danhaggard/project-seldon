@@ -4,6 +4,7 @@ import { PredictionDetail } from "@/components/predictions/prediction-detail";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { routes } from "@/config/routes";
 
 export default async function PredictionPage({
   params,
@@ -22,7 +23,7 @@ export default async function PredictionPage({
         className="mb-6 pl-0 hover:bg-transparent hover:text-primary"
         asChild
       >
-        <Link href={`/gurus/${slug}`}>
+        <Link href={routes.gurus.detail(slug)}>
           <ChevronLeft className="mr-2 h-4 w-4" />
           Back to Guru
         </Link>

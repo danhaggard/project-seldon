@@ -7,6 +7,7 @@ import { SmartLink } from "@/components/ui/smart-link";
 import { APP_PERMISSION } from "@/lib/definitions/rbac";
 import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { routes } from "@/config/routes";
 
 interface Props {
   slug: string;
@@ -65,7 +66,7 @@ export async function PredictionFeedContainer({
         {/* Add Prediction Button */}
         <div className="pb-1">
           <SmartLink
-            href={`/gurus/${slug}/add-prediction`}
+            href={routes.gurus.addPrediction(slug)}
             requiredPermission={APP_PERMISSION.PREDICTIONS_CREATE}
             className={buttonVariants({ variant: "default", size: "sm" })}
           >
@@ -94,7 +95,7 @@ export async function PredictionFeedContainer({
         totalItems={count}
         pageSize={pageSize}
         currentPage={page}
-        baseUrl={`/gurus/${slug}`}
+        baseUrl={routes.gurus.detail(slug)}
         scroll={false}
       />
     </div>

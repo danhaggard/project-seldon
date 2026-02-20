@@ -14,6 +14,7 @@ import {
   FormError,
   FormAlert,
 } from "@/components/layout/form-card";
+import { routes } from "@/config/routes";
 
 export function ForgotPasswordForm({
   className,
@@ -35,7 +36,7 @@ export function ForgotPasswordForm({
               reset your password shortly.
             </p>
             <Button asChild variant="outline" className="w-full">
-              <Link href="/auth/login">Back to Login</Link>
+              <Link href={routes.auth.login}>Back to Login</Link>
             </Button>
           </div>
         </FormCard>
@@ -49,7 +50,7 @@ export function ForgotPasswordForm({
               <div className="text-center text-sm text-muted-foreground">
                 Remember your password?{" "}
                 <Link
-                  href="/auth/login"
+                  href={routes.auth.login}
                   className="underline underline-offset-4 hover:text-primary"
                 >
                   Login

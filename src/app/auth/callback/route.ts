@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { routes } from "@/config/routes";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
       console.error("Auth Callback Error:", error.message);
       return NextResponse.redirect(
         new URL(
-          `/auth/error?error=${encodeURIComponent(error.message)}`,
+          `${routes.auth.error}?error=${encodeURIComponent(error.message)}`,
           requestUrl.origin,
         ),
       );
@@ -30,6 +31,6 @@ export async function GET(request: Request) {
 
   // If there's no code, redirect to an error page
   return NextResponse.redirect(
-    new URL(`/auth/error?error=Missing Auth Code`, requestUrl.origin),
+    new URL(`${routes.auth.error}?error=Missing Auth Code`, requestUrl.origin),
   );
 }

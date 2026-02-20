@@ -1,17 +1,16 @@
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { AppPermission, PermissionClaims } from "@/lib/definitions/rbac";
 import { getClaims, hasPermission } from "@/lib/supabase/rbac";
-import type { ComponentProps } from "react";
 
-interface SmartLinkProps extends ComponentProps<typeof Link> {
+interface SmartLinkProps<G> extends LinkProps<G> {
   requireAuth?: boolean;
   requiredPermission?: AppPermission;
   claims?: PermissionClaims | null;
 }
 
-export async function SmartLink({
+export async function SmartLink<G>({
   href,
   className,
   children,
@@ -19,7 +18,7 @@ export async function SmartLink({
   requiredPermission: manualPermission,
   claims: passedClaims,
   ...props
-}: SmartLinkProps) {
+}: SmartLinkProps<G>) {
   // 1. Use the passed claims if they exist, otherwise fetch them (fallback)
   let claims = passedClaims;
   if (claims === undefined) {

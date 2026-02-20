@@ -19,11 +19,8 @@ import {
   PredictionStatus,
 } from "@/lib/definitions/prediction";
 import React, { JSX } from "react";
+import { routes } from "@/config/routes";
 
-function getPredictionSlug(prediction: PredictionWithRelations) {
-  const guruSlug = prediction.gurus?.slug;
-  return guruSlug ? `/gurus/${guruSlug}/predictions/${prediction.id}` : `#`;
-}
 
 export function PredictionCard({
   prediction,
@@ -97,7 +94,7 @@ export function PredictionCard({
             {/* Title */}
             <h3 className="text-lg font-bold leading-tight text-foreground">
               <Link
-                href={getPredictionSlug(prediction)}
+                href={routes.gurus.predictionDetail(prediction.gurus?.slug || '', prediction.id)}
                 scroll={false}
                 className="focus:outline-none"
               >

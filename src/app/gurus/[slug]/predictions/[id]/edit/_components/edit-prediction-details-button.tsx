@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { ActionGuard } from "@/components/rbac/action-guard";
+import { routes } from "@/config/routes";
 
 type EditPredictionDetailsButtonProps = {
   createdById: string;
@@ -21,7 +22,7 @@ export async function EditPredictionDetailsButton({
       resourceOwnerId={createdById}
     >
       <Button variant="outline" size="sm" asChild className="mb-6">
-        <Link href={`/gurus/${guruSlug}/predictions/${predictionId}/edit`}>
+        <Link href={routes.gurus.predictionEdit(guruSlug, predictionId)}>
           <Pencil className="w-4 h-4 mr-2" />
           Edit Prediction
         </Link>

@@ -17,6 +17,7 @@ import {
 } from "@/components/layout/form-card";
 import Link from "next/link";
 import { Guru } from "@/lib/definitions/guru";
+import { routes } from "@/config/routes";
 
 export function EditGuruForm({ guru }: { guru: Guru }) {
   const [state, action, isPending] = useActionState(updateGuru, undefined);
@@ -124,7 +125,7 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>
-              <Link href={`/gurus/${guru.slug}`}>Cancel</Link>
+              <Link href={routes.gurus.detail(guru.slug)}>Cancel</Link>
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : "Save Changes"}

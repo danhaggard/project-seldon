@@ -1,26 +1,27 @@
 "use client";
 
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Route } from "next"; // <-- Import the Route type
 
-interface PaginationControlsProps {
+interface PaginationControlsProps<G> {
   totalItems: number;
   pageSize: number;
   currentPage: number;
-  baseUrl: string; // e.g., "/gurus/marc-andreessen"
+  baseUrl: LinkProps<G>['href'];
   scroll?: boolean;
 }
 
-export function PaginationControls({
+export function PaginationControls<G>({
   totalItems,
   pageSize,
   currentPage,
   baseUrl,
   scroll = true,
-}: PaginationControlsProps) {
+}: PaginationControlsProps<G>) {
   const searchParams = useSearchParams();
   const totalPages = Math.ceil(totalItems / pageSize);
 
@@ -28,7 +29,7 @@ export function PaginationControls({
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    return `${baseUrl}?${params.toString()}`;
+    return `${baseUrl}?${params.toString()}` as Route;
   };
 
   if (totalPages <= 1) return null;

@@ -4,6 +4,7 @@ import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { APP_PERMISSION } from "@/lib/definitions/rbac";
 import { getCategories } from "@/lib/data/categories";
 import { getGuruBySlug } from "@/lib/data/gurus";
+import { routes } from "@/config/routes";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -14,7 +15,7 @@ export default async function CreatePredictionPage({ params }: PageProps) {
   const claims = await getClaims();
 
   if (!claims) {
-    redirect("/login");
+    redirect(routes.auth.login);
   }
 
   // 1. Check Global Create Permission
@@ -24,7 +25,7 @@ export default async function CreatePredictionPage({ params }: PageProps) {
   );
 
   if (!isPermitted) {
-    redirect("/403-forbidden");
+    redirect(routes.forbidden);
   }
 
   // 2. Fetch required relational data

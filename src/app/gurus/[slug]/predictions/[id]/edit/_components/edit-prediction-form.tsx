@@ -27,6 +27,7 @@ import { useState } from "react";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
 import Link from "next/link";
 import { Category } from "@/lib/definitions/category";
+import { routes } from "@/config/routes";
 
 
 interface EditPredictionFormProps {
@@ -207,7 +208,7 @@ export function EditPredictionForm({
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>
-              <Link href={`/gurus/${guruSlug}/predictions/${prediction.id}`}>
+              <Link href={routes.gurus.predictionDetail(guruSlug, prediction.id)}>
                 Cancel
               </Link>
             </Button>

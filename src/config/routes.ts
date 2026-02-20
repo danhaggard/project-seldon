@@ -1,5 +1,26 @@
 // src/config/routes.ts
 
+
+function gurusDetail<S extends string>(slug: S): S extends `${infer R}` ? `/gurus/${R}` : `/gurus/slug` {
+  return `/gurus/${slug}` as S extends `${infer R}` ? `/gurus/${R}` : `/gurus/slug`;
+}
+
+function gurusEdit<S extends string>(slug: S): S extends `${infer R}` ? `/gurus/${R}/edit` : `/gurus/slug/edit` {
+  return `/gurus/${slug}/edit` as S extends `${infer R}` ? `/gurus/${R}/edit` : `/gurus/slug/edit`;
+}
+
+function gurusAddPrediction<S extends string>(slug: S): S extends `${infer R}` ? `/gurus/${R}/add-prediction` : `/gurus/slug/add-prediction` {
+  return `/gurus/${slug}/add-prediction` as S extends `${infer R}` ? `/gurus/${R}/add-prediction` : `/gurus/slug/add-prediction`;
+}
+
+function gurusPredictionDetail<S extends string, T extends string>(slug: S, id: T): S extends `${infer R}` ? `/gurus/${R}/predictions/${T}` : `/gurus/slug/predictions/id` {
+  return `/gurus/${slug}/predictions/${id}` as S extends `${infer R}` ? `/gurus/${R}/predictions/${T}` : `/gurus/slug/predictions/id`;
+}
+
+function gurusPredictionEdit<S extends string, T extends string>(slug: S, id: T): S extends `${infer R}` ? `/gurus/${R}/predictions/${T}/edit` : `/gurus/slug/predictions/id/edit` {
+  return `/gurus/${slug}/predictions/${id}/edit` as S extends `${infer R}` ? `/gurus/${R}/predictions/${T}/edit` : `/gurus/slug/predictions/id/edit`;
+}
+
 export const routes = {
   // Top-level
   home: "/",
@@ -21,19 +42,21 @@ export const routes = {
     callback: "/auth/callback",
     confirm: "/auth/confirm",
   },
+  
 
   // Gurus Domain
   gurus: {
     index: "/gurus",
     // Using functions for dynamic routes ensures type-safe parameter passing
-    detail: (slug: string) => `/gurus/${slug}`,
-    edit: (slug: string) => `/gurus/${slug}/edit`,
-    addPrediction: (slug: string) => `/gurus/${slug}/add-prediction`,
+    detail: gurusDetail,
+    create: "/gurus/create",
+    edit: gurusEdit,
+    addPrediction: gurusAddPrediction,
     
     // For your intercepting route: @modal/(.)predictions/[id]
     // Even though it's intercepted as a modal, the URL structure remains logical
-    predictionDetail: (slug: string, id: string) => `/gurus/${slug}/predictions/${id}`,
-    predictionEdit: (slug: string, id: string) => `/gurus/${slug}/predictions/${id}/edit`,
+    predictionDetail: gurusPredictionDetail,
+    predictionEdit: gurusPredictionEdit,
   },
 
 
@@ -44,8 +67,8 @@ export type AppRoutes = typeof routes;
 
 type ExtractStringValues<T> = T extends string
   ? T
-  : T extends (...args: unknown[]) => unknown
-  ? never // Ignore dynamic route functions
+  : T extends (...args: unknown[]) => infer R
+  ? R
   : T extends object
   ? { [K in keyof T]: ExtractStringValues<T[K]> }[keyof T] // Recurse into nested objects
   : never;

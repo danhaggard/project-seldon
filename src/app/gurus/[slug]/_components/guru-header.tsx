@@ -4,7 +4,6 @@ import { Globe, Youtube, Twitter } from "lucide-react";
 import { CredibilityRing } from "./credibility-ring";
 import { notFound } from "next/navigation";
 import { getGuruBySlug } from "@/lib/data/gurus";
-
 import { Suspense } from "react";
 import { EditDetailsButton } from "./edit-details-button";
 
