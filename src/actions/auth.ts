@@ -1,17 +1,25 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server"; // Use your server client!
-import {
-  ForgotPasswordSchema,
-  ForgotPasswordState,
-} from "@/lib/definitions/auth";
-import { LoginFormSchema, LoginFormState } from "@/lib/definitions/auth";
-import { SignupFormSchema, SignupFormState } from "@/lib/definitions/auth";
-import {
-  UpdatePasswordSchema,
-  UpdatePasswordState,
-} from "@/lib/definitions/auth";
+import { createClient } from "@/lib/supabase/server";
+import * as z from "zod";
 import { redirect } from "next/navigation";
+
+const ForgotPasswordSchema = z.object({
+  email: z.email({ message: "Please enter a valid email." }),
+});
+
+export type ForgotPasswordState =
+  | {
+      errors?: {
+        email?: string[];
+      };
+      message?: string;
+      success?: boolean; // We add a success flag to toggle the UI
+      inputs?: {
+        email: string;
+      };
+    }
+  | undefined;
 
 export async function forgotPassword(
   state: ForgotPasswordState,
@@ -48,6 +56,24 @@ export async function forgotPassword(
     success: true,
   };
 }
+
+const LoginFormSchema = z.object({
+  email: z.email({ message: "Please enter a valid email." }),
+  password: z.string().min(1, { message: "Password field must not be empty." }),
+});
+
+export type LoginFormState =
+  | {
+      errors?: {
+        email?: string[];
+        password?: string[];
+      };
+      message?: string;
+      inputs?: {
+        email: string;
+      };
+    }
+  | undefined;
 
 export async function login(
   state: LoginFormState,
@@ -86,6 +112,40 @@ export async function login(
   // 3. Success!
   redirect("/");
 }
+
+ const SignupFormSchema = z
+  .object({
+    email: z.email({ error: "Please enter a valid email." }).trim(),
+    password: z
+      .string()
+      .min(8, { message: "Be at least 8 characters long" })
+      .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
+      .regex(/[0-9]/, { message: "Contain at least one number." })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Contain at least one special character.",
+      })
+      .trim(),
+    // Add validation for the repeat password field itself
+    repeatPassword: z.string(),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Passwords do not match",
+    path: ["repeatPassword"], // This attaches the error to the repeatPassword field
+  });
+
+export type SignupFormState =
+  | {
+      errors?: {
+        email?: string[];
+        password?: string[];
+        repeatPassword?: string[]; // Add this
+      };
+      message?: string;
+      inputs?: {
+        email: string;
+      };
+    }
+  | undefined;
 
 export async function signup(
   state: SignupFormState,
@@ -150,6 +210,38 @@ export async function signout() {
   // Redirecting from a Server Action automatically invalidates the cache
   redirect("/auth/login");
 }
+
+ const UpdatePasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "Be at least 8 characters long" })
+      .regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
+      .regex(/[0-9]/, { message: "Contain at least one number." })
+      .regex(/[^a-zA-Z0-9]/, {
+        message: "Contain at least one special character.",
+      })
+      .trim(),
+    repeatPassword: z
+      .string()
+      .min(1, { message: "Please confirm your password" }),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Passwords do not match",
+    path: ["repeatPassword"], // Attaches error to the second field
+  });
+
+export type UpdatePasswordState =
+  | {
+      errors?: {
+        password?: string[];
+        repeatPassword?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+
 
 export async function updatePassword(
   state: UpdatePasswordState,
