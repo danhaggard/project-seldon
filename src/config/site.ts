@@ -8,7 +8,6 @@ import {
   Home,
   Users,
   ShieldCheck,
-  CircleUser,
   Video,
   Mic,
   FileText,
@@ -97,12 +96,6 @@ export const siteConfig: SiteConfig = {
       icon: ShieldCheck,
       requireAuth: true,
       requiredPermission: APP_PERMISSION.USERS_MANAGE, // Clear, explicit intent
-    },
-    {
-      title: "Account",
-      href: routes.account,
-      icon: CircleUser,
-      requireAuth: true, // Just needs a logged-in user
     },
   ],
 

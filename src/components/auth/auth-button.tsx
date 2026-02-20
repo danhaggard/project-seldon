@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
@@ -12,8 +13,13 @@ export async function AuthButton() {
   const user = data?.claims;
 
   return user ? (
-    <div className="flex items-center gap-4">
-      Hey, {user.email}!
+    <div className="flex items-center gap-2">
+      <Button asChild variant="ghost" size="icon" className="rounded-full">
+        <Link href={routes.account} title="Account">
+          <User className="w-5 h-5 text-muted-foreground" />
+          <span className="sr-only">Account</span>
+        </Link>
+      </Button>
       <LogoutButton />
     </div>
   ) : (
