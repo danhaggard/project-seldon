@@ -4,7 +4,7 @@ import { SignUpForm } from "@/app/auth/sign-up/_components/sign-up-form";
 export default function SignUpInterceptRoute() {
   return (
     <AuthModal>
-      <SignUpForm />
+      <SignUpForm isModal />
     </AuthModal>
   );
 }

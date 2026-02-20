@@ -21,8 +21,9 @@ import { routes } from "@/config/routes";
 
 export function SignUpForm({
   className,
+  isModal = false,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & { isModal?: boolean }) {
   const router = useRouter();
   const [state, action, isPending] = useActionState(signup, undefined);
 
@@ -76,7 +77,7 @@ export function SignUpForm({
   return (
     <div className={className} {...props}>
       <form action={action} aria-busy={isPending}>
-        <input type="hidden" name="isModal" value="true" />
+        {isModal && <input type="hidden" name="isModal" value="true" />}
         <FormCard
           title={<h1>Sign up</h1>}
           description={<p>Create a new account</p>}

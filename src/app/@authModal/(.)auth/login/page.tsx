@@ -4,7 +4,7 @@ import { LoginForm } from "@/app/auth/login/_components/login-form";
 export default function LoginInterceptRoute() {
   return (
     <AuthModal>
-      <LoginForm />
+      <LoginForm isModal />
     </AuthModal>
   );
 }

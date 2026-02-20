@@ -19,8 +19,9 @@ import { routes } from "@/config/routes";
 
 export function LoginForm({
   className,
+  isModal = false,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: React.ComponentPropsWithoutRef<"div"> & { isModal?: boolean }) {
   const router = useRouter();
   const [state, action, isPending] = useActionState(login, undefined);
 
@@ -36,7 +37,7 @@ export function LoginForm({
   return (
     <div className={className} {...props}>
       <form action={action} aria-busy={isPending}>
-        <input type="hidden" name="isModal" value="true" />
+        {isModal && <input type="hidden" name="isModal" value="true" />}
         <FormCard
           title={<h1>Login</h1>}
           description={<p>Enter your email below to login to your account</p>}
