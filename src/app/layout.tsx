@@ -33,8 +33,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  authModal,
 }: Readonly<{
   children: React.ReactNode;
+  authModal: React.ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -72,6 +74,8 @@ export default function RootLayout({
 
           {/* DYNAMIC CONTENT AREA */}
           <div className="flex-1 flex flex-col">{children}</div>
+
+          {authModal}
 
           <Toaster />
         </ThemeProvider>
