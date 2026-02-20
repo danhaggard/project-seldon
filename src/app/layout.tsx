@@ -8,6 +8,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { MobileSheet } from "@/components/layout/mobile-sheet";
 
 import "./globals.css";
+import Link from "next/link";
+import { routes } from "@/config/routes";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -54,10 +56,11 @@ export default function RootLayout({
                   <SidebarContent />
                 </MobileSheet>
               </div>
-
-              <div className="font-bold text-xl tracking-tighter">
-                PROJECT SELDON
-              </div>
+              <Link href={routes.home}>
+                <div className="font-bold text-xl tracking-tighter">
+                  PROJECT SELDON
+                </div>
+              </Link>
 
               <div className="flex-1" />
 
@@ -68,10 +71,8 @@ export default function RootLayout({
           </header>
 
           {/* DYNAMIC CONTENT AREA */}
-          <div className="flex-1 flex flex-col">
-            {children}
-          </div>
-          
+          <div className="flex-1 flex flex-col">{children}</div>
+
           <Toaster />
         </ThemeProvider>
       </body>

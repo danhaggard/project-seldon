@@ -2,9 +2,10 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { unauthorized, unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { getClaims } from "@/lib/supabase/rbac";
+import { redirect } from "next/navigation";
+import { routes } from "@/config/routes";
 
 const CastVoteSchema = z.object({
   sourceId: z.uuid(),
@@ -29,7 +30,7 @@ export async function castValidationVote(
   const claims = await getClaims();
 
   if (!claims) {
-    unauthorized();
+    redirect(routes.auth.signUp);
   }
 
   try {
@@ -85,7 +86,6 @@ export async function castValidationVote(
     revalidatePath(validated.data.pathname);
     return { success: true };
   } catch (error: unknown) {
-    unstable_rethrow(error);
     console.error("Validation Vote Error:", error);
     return { error: "Failed to register validation. Please try again." };
   }
