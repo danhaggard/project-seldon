@@ -13,9 +13,9 @@ import {
   FormGroup,
   FormError,
   FormAlert,
+  FormFieldDescription,
 } from "@/components/layout/form-card";
 
-// Define the shape of the data we expect from Supabase
 interface ProfileData {
   full_name: string | null;
   username: string | null;
@@ -34,12 +34,28 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
         description={<p>Update your personal information.</p>}
       >
         <FormContent>
+          {/* Username (Read Only) */}
+          <FormGroup>
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              defaultValue={profile.username || ""}
+              disabled
+              autoComplete="username"
+              className="bg-muted text-muted-foreground"
+              aria-describedby="usernameDesc"
+            />
+            <FormFieldDescription id="usernameDesc">
+              Your username is your unique identity and cannot be changed.
+            </FormFieldDescription>
+          </FormGroup>
+
           {/* Email (Read Only) */}
           <FormGroup>
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              value={profile.email}
+              defaultValue={profile.email}
               disabled
               autoComplete="email"
               className="bg-muted text-muted-foreground"
@@ -60,22 +76,6 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
               aria-describedby="fullNameError"
             />
             <FormError id="fullNameError" errors={state?.errors?.fullName} />
-          </FormGroup>
-
-          {/* Username */}
-          <FormGroup>
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              name="username"
-              placeholder="username"
-              defaultValue={profile.username || ""}
-              autoComplete="username"
-              className={cn(state?.errors?.username && "border-red-500")}
-              aria-invalid={!!state?.errors?.username}
-              aria-describedby="usernameError"
-            />
-            <FormError id="usernameError" errors={state?.errors?.username} />
           </FormGroup>
 
           {/* Website */}

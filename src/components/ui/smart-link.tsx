@@ -1,13 +1,11 @@
-import Link, { LinkProps } from "next/link";
+import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { AppPermission, PermissionClaims } from "@/lib/definitions/rbac";
 import { getClaims, hasPermission } from "@/lib/supabase/rbac";
+import type { ComponentProps } from "react";
 
-interface SmartLinkProps extends Omit<LinkProps, "href"> {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
+interface SmartLinkProps extends ComponentProps<typeof Link> {
   requireAuth?: boolean;
   requiredPermission?: AppPermission;
   claims?: PermissionClaims | null;

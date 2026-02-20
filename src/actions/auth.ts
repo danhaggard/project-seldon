@@ -113,8 +113,27 @@ export async function login(
   redirect("/");
 }
 
- const SignupFormSchema = z
+export async function checkUsername(username: string): Promise<boolean> {
+  const supabase = await createClient();
+  
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("username", username)
+    .maybeSingle();
+
+  // If no data is returned, the username is unique (available)
+  return !data;
+}
+
+const SignupFormSchema = z
   .object({
+    username: z
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .max(20, "Username cannot exceed 20 characters")
+      .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed")
+      .trim(),
     email: z.email({ error: "Please enter a valid email." }).trim(),
     password: z
       .string()
@@ -136,12 +155,14 @@ export async function login(
 export type SignupFormState =
   | {
       errors?: {
+        username?: string[];
         email?: string[];
         password?: string[];
         repeatPassword?: string[]; // Add this
       };
       message?: string;
       inputs?: {
+        username: string;
         email: string;
       };
     }
@@ -152,11 +173,13 @@ export async function signup(
   formData: FormData,
 ): Promise<SignupFormState> {
   // 1. Validate form fields using Zod
+  const rawUsername = formData.get("username") as string;
   const rawEmail = formData.get("email") as string;
   const rawPassword = formData.get("password") as string;
   const rawRepeatPassword = formData.get("repeat-password") as string;
 
   const validatedFields = SignupFormSchema.safeParse({
+    username: rawUsername,
     email: rawEmail,
     password: rawPassword,
     repeatPassword: rawRepeatPassword,
@@ -168,13 +191,14 @@ export async function signup(
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Missing Fields. Failed to Create Account.",
       inputs: {
+        username: rawUsername,
         email: rawEmail, // 👈 Echo the email back so the form can "remember" it
       },
     };
   }
 
   // 3. Prepare data for insertion
-  const { email, password } = validatedFields.data;
+  const { username, email, password } = validatedFields.data;
   const supabase = await createClient();
 
   // 4. Call Supabase Auth
@@ -183,6 +207,9 @@ export async function signup(
     password,
     // Ensure you have this configured in Supabase > Authentication > URL Configuration
     options: {
+      data: {
+        username,
+      },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
     },
   });
@@ -192,6 +219,7 @@ export async function signup(
       message: error.message,
       inputs: {
         email: rawEmail, // 👈 Also return it here if Supabase fails (e.g., rate limit)
+        username: rawUsername,
       },
     };
   }
@@ -200,7 +228,6 @@ export async function signup(
   // Note: We throw redirect outside the try/catch block usually, but here
   // we are at the end of the function so it's safe.
   redirect("/auth/sign-up-success");
-  //refresh();
 }
 
 export async function signout() {
