@@ -2,14 +2,17 @@
 
 import { useActionState } from "react";
 import { updatePassword } from "@/actions/auth";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout";
+  FormAlert,
+  FormError,
+} from "@/components/layout/form-card";
 
 export function UpdatePasswordForm({
   className,
@@ -19,10 +22,10 @@ export function UpdatePasswordForm({
 
   return (
     <div className={className} {...props}>
-      <form action={action}>
-        <AuthCard
-          title="Update Your Password"
-          description="Please enter your new password below."
+      <form action={action} aria-busy={isPending}>
+        <FormCard
+          title={<h1>Update Your Password</h1>}
+          description={<p>Please enter your new password below.</p>}
         >
           <FormContent>
             {/* New Password Field */}
@@ -34,13 +37,19 @@ export function UpdatePasswordForm({
                 type="password"
                 placeholder="New password"
                 required
+                autoComplete="new-password"
+                className={cn(state?.errors?.password && "border-red-500")}
+                aria-invalid={!!state?.errors?.password}
+                aria-describedby="passwordError"
               />
               {state?.errors?.password && (
-                <ul className="text-sm text-red-500 list-disc list-inside">
-                  {state.errors.password.map((err) => (
-                    <li key={err}>{err}</li>
-                  ))}
-                </ul>
+                <div id="passwordError" aria-live="polite" className="text-sm text-red-500">
+                  <ul className="list-disc list-inside">
+                    {state.errors.password.map((err) => (
+                      <li key={err}>{err}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </FormGroup>
 
@@ -53,26 +62,22 @@ export function UpdatePasswordForm({
                 type="password"
                 placeholder="Confirm new password"
                 required
+                autoComplete="new-password"
+                className={cn(state?.errors?.repeatPassword && "border-red-500")}
+                aria-invalid={!!state?.errors?.repeatPassword}
+                aria-describedby="repeatPasswordError"
               />
-              {state?.errors?.repeatPassword && (
-                <p className="text-sm text-red-500">
-                  {state.errors.repeatPassword[0]}
-                </p>
-              )}
+              <FormError id="repeatPasswordError" errors={state?.errors?.repeatPassword} />
             </FormGroup>
 
             {/* Global Error */}
-            {state?.message && (
-              <p className="text-sm text-red-500 font-medium">
-                {state.message}
-              </p>
-            )}
+            <FormAlert message={state?.message} />
 
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Saving..." : "Save new password"}
             </Button>
           </FormContent>
-        </AuthCard>
+        </FormCard>
       </form>
     </div>
   );

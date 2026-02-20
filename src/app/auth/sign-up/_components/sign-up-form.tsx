@@ -2,15 +2,18 @@
 
 import { useActionState } from "react";
 import { signup } from "@/actions/auth";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  AuthCard,
+  FormCard,
   FormContent,
   FormGroup,
-} from "@/components/auth/form-layout";
+  FormError,
+  FormAlert,
+} from "@/components/layout/form-card";
 
 export function SignUpForm({
   className,
@@ -20,10 +23,10 @@ export function SignUpForm({
 
   return (
     <div className={className} {...props}>
-      <form action={action}>
-        <AuthCard
-          title="Sign up"
-          description="Create a new account"
+      <form action={action} aria-busy={isPending}>
+        <FormCard
+          title={<h1>Sign up</h1>}
+          description={<p>Create a new account</p>}
           footer={
             <div className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
@@ -46,21 +49,31 @@ export function SignUpForm({
                 type="email"
                 placeholder="m@example.com"
                 defaultValue={state?.inputs?.email}
+                autoComplete="email"
+                className={cn(state?.errors?.email && "border-red-500")}
+                aria-invalid={!!state?.errors?.email}
+                aria-describedby="emailError"
               />
-              {state?.errors?.email && (
-                <p className="text-sm text-red-500">{state.errors.email[0]}</p>
-              )}
+              <FormError id="emailError" errors={state?.errors?.email} />
             </FormGroup>
 
             {/* Password Field */}
             <FormGroup>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" />
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                autoComplete="new-password"
+                className={cn(state?.errors?.password && "border-red-500")}
+                aria-invalid={!!state?.errors?.password}
+                aria-describedby="passwordError"
+              />
               {state?.errors?.password && (
-                <div className="text-sm text-red-500">
-                  <ul>
+                <div id="passwordError" aria-live="polite" className="text-sm text-red-500">
+                  <ul className="list-disc pl-5">
                     {state.errors.password.map((error: string) => (
-                      <li key={error}>- {error}</li>
+                      <li key={error}>{error}</li>
                     ))}
                   </ul>
                 </div>
@@ -74,26 +87,22 @@ export function SignUpForm({
                 id="repeat-password"
                 name="repeat-password"
                 type="password"
+                autoComplete="new-password"
+                className={cn(state?.errors?.repeatPassword && "border-red-500")}
+                aria-invalid={!!state?.errors?.repeatPassword}
+                aria-describedby="repeatPasswordError"
               />
-              {state?.errors?.repeatPassword && (
-                <p className="text-sm text-red-500">
-                  {state.errors.repeatPassword[0]}
-                </p>
-              )}
+              <FormError id="repeatPasswordError" errors={state?.errors?.repeatPassword} />
             </FormGroup>
 
             {/* Global Error Message */}
-            {state?.message && (
-              <p className="text-sm text-red-500 font-medium">
-                {state.message}
-              </p>
-            )}
+            <FormAlert message={state?.message} />
 
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Creating account..." : "Sign up"}
             </Button>
           </FormContent>
-        </AuthCard>
+        </FormCard>
       </form>
     </div>
   );

@@ -8,9 +8,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-// Schema matching your V2 database structure
-const UpdatePredictionSchema = z.object({
-  id: z.string().uuid(),
+const CommonPredictionSchema = {
   guru_slug: z.string(), // Needed for redirect
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().optional(),
@@ -24,6 +22,12 @@ const UpdatePredictionSchema = z.object({
   confidence_level: z.coerce.number().min(0).max(100).optional(),
   status: z.enum(["pending", "correct", "incorrect", "in_evaluation", "vague"]),
   sources_json: z.string(),
+};
+
+// Schema matching your V2 database structure
+const UpdatePredictionSchema = z.object({
+  id: z.uuid(),
+  ...CommonPredictionSchema,
 });
 
 export type UpdatePredictionFormState =
@@ -206,22 +210,11 @@ export async function updatePrediction(
 }
 
 const CreatePredictionSchema = z.object({
-  guru_id: z.string().uuid(),
-  guru_slug: z.string(), // Needed for redirect routing
-  title: z.string().min(5, "Title must be at least 5 characters"),
-  description: z.string().optional(),
-  category_id: z.coerce
-    .number()
-    .int()
-    .positive("Please select a valid category")
-    .optional(),
+  guru_id: z.uuid(),
   prediction_date: z.string().refine((date) => !isNaN(Date.parse(date)), {
     message: "Invalid prediction date",
   }),
-  resolution_window_end: z.string().optional().or(z.literal("")),
-  confidence_level: z.coerce.number().min(0).max(100).optional(),
-  status: z.enum(["pending", "correct", "incorrect", "in_evaluation", "vague"]),
-  sources_json: z.string(),
+  ...CommonPredictionSchema,
 });
 
 export type CreatePredictionFormState =

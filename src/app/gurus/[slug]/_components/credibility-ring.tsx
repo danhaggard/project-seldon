@@ -54,7 +54,7 @@ export function CredibilityRing({ score, size = "lg" }: CredibilityRingProps) {
         </div>
       </div>
       <div className="mt-4 text-center">
-        <h3 className="font-medium">Credibility Score</h3>
+        <h2 className="font-medium">Credibility Score</h2>
         <p className="text-xs text-muted-foreground mt-1">
           {score > 80
             ? "Top 5% of all Gurus"

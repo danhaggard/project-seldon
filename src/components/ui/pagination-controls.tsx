@@ -54,6 +54,7 @@ export function PaginationControls({
           className="h-8 w-8"
           disabled={currentPage <= 1}
           asChild={currentPage > 1}
+          aria-label="Previous page"
         >
           {currentPage > 1 ? (
             <Link href={createPageUrl(currentPage - 1)} scroll={scroll}>
@@ -91,6 +92,7 @@ export function PaginationControls({
           className="h-8 w-8"
           disabled={currentPage >= totalPages}
           asChild={currentPage < totalPages}
+          aria-label="Next page"
         >
           {currentPage < totalPages ? (
             <Link href={createPageUrl(currentPage + 1)} scroll={scroll}>
