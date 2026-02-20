@@ -58,6 +58,58 @@ export type Database = {
         }
         Relationships: []
       }
+      guru_comments: {
+        Row: {
+          content: string
+          created_at: string
+          guru_id: string
+          id: string
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          guru_id: string
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          guru_id?: string
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guru_comments_guru_id_fkey"
+            columns: ["guru_id"]
+            isOneToOne: false
+            referencedRelation: "gurus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guru_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "guru_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guru_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gurus: {
         Row: {
           avatar_url: string | null

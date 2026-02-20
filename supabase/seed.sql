@@ -17,7 +17,7 @@ WITH inserted_users AS (
         extensions.crypt('password123', extensions.gen_salt('bf')),
         current_timestamp, current_timestamp, current_timestamp,
         '{"provider":"email","providers":["email"]}', 
-        '{}',
+        format('{"username":"user%s"}', series_val)::jsonb,
         current_timestamp, current_timestamp, 
         '', '', '', ''
     FROM generate_series(1, 10) AS series_val

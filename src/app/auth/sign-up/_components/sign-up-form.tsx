@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useRef, useState, useEffect } from "react";
 import { signup, checkUsername } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +14,7 @@ import {
   FormGroup,
   FormError,
   FormAlert,
-  FormFieldDescription
+  FormFieldDescription,
 } from "@/components/layout/form-card";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { routes } from "@/config/routes";
@@ -22,14 +23,22 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const router = useRouter();
   const [state, action, isPending] = useActionState(signup, undefined);
+
+  useEffect(() => {
+    if (state?.success) {
+      router.back();
+      router.refresh();
+    }
+  }, [state?.success, router]);
 
   // Custom Username State
   const [username, setUsername] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [isUnique, setIsUnique] = useState<boolean | null>(null);
-const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-// The new onChange handler
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // The new onChange handler
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUsername = e.target.value.toLowerCase();
     setUsername(newUsername);
@@ -53,7 +62,7 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     // 4. Start the new timer
     debounceTimerRef.current = setTimeout(async () => {
       const isValidFormat = /^[a-zA-Z0-9_]{3,20}$/.test(newUsername);
-      
+
       if (isValidFormat) {
         const unique = await checkUsername(newUsername);
         setIsUnique(unique);
@@ -67,6 +76,7 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   return (
     <div className={className} {...props}>
       <form action={action} aria-busy={isPending}>
+        <input type="hidden" name="isModal" value="true" />
         <FormCard
           title={<h1>Sign up</h1>}
           description={<p>Create a new account</p>}
@@ -96,25 +106,37 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
                   onChange={handleUsernameChange}
                   className={cn(
                     "pl-8",
-                    state?.errors?.username || isUnique === false ? "border-red-500" : "",
-                    isUnique === true ? "border-green-500" : ""
+                    state?.errors?.username || isUnique === false
+                      ? "border-red-500"
+                      : "",
+                    isUnique === true ? "border-green-500" : "",
                   )}
                   aria-invalid={!!state?.errors?.username || isUnique === false}
                   aria-describedby="usernameError usernameDesc"
                 />
-                
+
                 <div className="absolute right-3 top-2.5">
-                  {isChecking && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-                  {!isChecking && isUnique === true && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                  {!isChecking && isUnique === false && <XCircle className="h-4 w-4 text-red-500" />}
+                  {isChecking && (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                  {!isChecking && isUnique === true && (
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  )}
+                  {!isChecking && isUnique === false && (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  )}
                 </div>
               </div>
-              
+
               <FormError id="usernameError" errors={state?.errors?.username} />
-              {!isChecking && isUnique === false && !state?.errors?.username && (
-                <p className="text-sm text-red-500">Username is taken or invalid.</p>
-              )}
-              
+              {!isChecking &&
+                isUnique === false &&
+                !state?.errors?.username && (
+                  <p className="text-sm text-red-500">
+                    Username is taken or invalid.
+                  </p>
+                )}
+
               <FormFieldDescription id="usernameDesc">
                 This will be your public identity. It cannot be changed later.
               </FormFieldDescription>
@@ -139,17 +161,21 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
             {/* Password Field */}
             <FormGroup>
               <Label htmlFor="password">Password</Label>
-              <Input 
-                id="password" 
-                name="password" 
-                type="password" 
+              <Input
+                id="password"
+                name="password"
+                type="password"
                 autoComplete="new-password"
                 className={cn(state?.errors?.password && "border-red-500")}
                 aria-invalid={!!state?.errors?.password}
                 aria-describedby="passwordError"
               />
               {state?.errors?.password && (
-                <div id="passwordError" aria-live="polite" className="text-sm text-red-500">
+                <div
+                  id="passwordError"
+                  aria-live="polite"
+                  className="text-sm text-red-500"
+                >
                   <ul className="list-disc pl-5">
                     {state.errors.password.map((error: string) => (
                       <li key={error}>{error}</li>
@@ -167,11 +193,16 @@ const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
                 name="repeat-password"
                 type="password"
                 autoComplete="new-password"
-                className={cn(state?.errors?.repeatPassword && "border-red-500")}
+                className={cn(
+                  state?.errors?.repeatPassword && "border-red-500",
+                )}
                 aria-invalid={!!state?.errors?.repeatPassword}
                 aria-describedby="repeatPasswordError"
               />
-              <FormError id="repeatPasswordError" errors={state?.errors?.repeatPassword} />
+              <FormError
+                id="repeatPasswordError"
+                errors={state?.errors?.repeatPassword}
+              />
             </FormGroup>
 
             {/* Global Error Message */}

@@ -70,6 +70,7 @@ export type LoginFormState =
         password?: string[];
       };
       message?: string;
+      success?: boolean;
       inputs?: {
         email: string;
       };
@@ -111,12 +112,18 @@ export async function login(
   }
 
   // 3. Success!
+  const isModal = formData.get("isModal") === "true";
+
+  if (isModal) {
+    return { success: true };
+  }
+
   redirect(routes.home);
 }
 
 export async function checkUsername(username: string): Promise<boolean> {
   const supabase = await createClient();
-  
+
   const { data, error } = await supabase
     .from("profiles")
     .select("username")
@@ -133,7 +140,10 @@ const SignupFormSchema = z
       .string()
       .min(3, "Username must be at least 3 characters")
       .max(20, "Username cannot exceed 20 characters")
-      .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores allowed")
+      .regex(
+        /^[a-zA-Z0-9_]+$/,
+        "Only letters, numbers, and underscores allowed",
+      )
       .trim(),
     email: z.email({ error: "Please enter a valid email." }).trim(),
     password: z
@@ -162,6 +172,7 @@ export type SignupFormState =
         repeatPassword?: string[]; // Add this
       };
       message?: string;
+      success?: boolean;
       inputs?: {
         username: string;
         email: string;
@@ -226,8 +237,12 @@ export async function signup(
   }
 
   // 5. Success! Redirect the user
-  // Note: We throw redirect outside the try/catch block usually, but here
-  // we are at the end of the function so it's safe.
+  const isModal = formData.get("isModal") === "true";
+
+  if (isModal) {
+    return { success: true };
+  }
+
   redirect(routes.auth.signUpSuccess);
 }
 
@@ -239,7 +254,7 @@ export async function signout() {
   redirect(routes.auth.login);
 }
 
- const UpdatePasswordSchema = z
+const UpdatePasswordSchema = z
   .object({
     password: z
       .string()
@@ -268,8 +283,6 @@ export type UpdatePasswordState =
       message?: string;
     }
   | undefined;
-
-
 
 export async function updatePassword(
   state: UpdatePasswordState,
