@@ -16,6 +16,7 @@ import {
   FormAlert,
 } from "@/components/layout/form-card";
 import Link from "next/link";
+import { routes } from "@/config/routes";
 
 export function CreateGuruForm() {
   const [state, action, isPending] = useActionState(createGuru, undefined);
@@ -119,7 +120,7 @@ export function CreateGuruForm() {
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" asChild disabled={isPending}>
-              <Link href="/gurus">Cancel</Link>
+              <Link href={routes.gurus.index}>Cancel</Link>
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Creating..." : "Create Guru"}

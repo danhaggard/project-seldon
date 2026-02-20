@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { routes } from "@/config/routes";
+
 
 const CommonPredictionSchema = {
   guru_slug: z.string(), // Needed for redirect
@@ -204,7 +206,7 @@ export async function updatePrediction(
   }
 
   // 5. Redirect
-  const predictionPath = `/gurus/${validated.data.guru_slug}/predictions/${validated.data.id}`;
+  const predictionPath = routes.gurus.predictionDetail(validated.data.guru_slug, validated.data.id);
   revalidatePath(predictionPath);
   redirect(`${predictionPath}?status=updated`);
 }
@@ -346,7 +348,7 @@ export async function createPrediction(
   }
 
   // 5. Redirect
-  const guruPath = `/gurus/${validated.data.guru_slug}`;
+  const guruPath = routes.gurus.detail(validated.data.guru_slug);
   revalidatePath(guruPath);
   redirect(`${guruPath}?status=prediction_created`);
 }

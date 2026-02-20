@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { routes } from "@/config/routes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { SmartLink } from "@/components/ui/smart-link";
 import { APP_PERMISSION } from "@/lib/definitions/rbac";
 import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Guru } from "@/lib/definitions/guru";
 
 export const dynamic = "force-dynamic"; // Ensure we get fresh data
 
@@ -13,10 +15,12 @@ export default async function GurusListPage() {
   const supabase = await createClient();
 
   // Fetch all gurus, ordered by credibility (Highest first)
-  const { data: gurus } = await supabase
+  const { data } = await supabase
     .from("gurus")
     .select("*")
     .order("credibility_score", { ascending: false });
+
+    const gurus = data as Guru[]
 
   if (!gurus || gurus.length === 0) {
     return (
@@ -26,7 +30,7 @@ export default async function GurusListPage() {
           No gurus found. Run the seed script or add one manually!
         </p>
         <SmartLink
-          href="/gurus/create"
+          href={routes.gurus.create}
           requiredPermission={APP_PERMISSION.GURUS_CREATE}
           className={buttonVariants({ variant: "default" })}
         >
@@ -48,7 +52,7 @@ export default async function GurusListPage() {
 
         {/* Add Guru Button protected by RBAC */}
         <SmartLink
-          href="/gurus/create"
+          href={routes.gurus.create}
           requiredPermission={APP_PERMISSION.GURUS_CREATE}
           className={buttonVariants({ variant: "default" })}
         >
@@ -60,7 +64,7 @@ export default async function GurusListPage() {
         {gurus.map((guru) => (
           <Link
             key={guru.id}
-            href={`/gurus/${guru.slug}`}
+            href={routes.gurus.detail(guru.slug)}
             className="block group"
           >
             <Card className="h-full hover:shadow-md transition-shadow duration-200">

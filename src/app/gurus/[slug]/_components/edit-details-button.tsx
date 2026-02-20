@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { ActionGuard } from "@/components/rbac/action-guard";
+import { routes } from "@/config/routes";
 
 type EditDetailsButtonProps = {
   createdById: string;
@@ -19,7 +20,7 @@ export async function EditDetailsButton({
       resourceOwnerId={createdById}
     >
       <Button variant="outline" size="sm" asChild className="mb-2">
-        <Link href={`/gurus/${guruSlug}/edit`}>
+        <Link href={routes.gurus.edit(guruSlug)}>
           <Pencil className="w-4 h-4 mr-2" />
           Edit Details
         </Link>

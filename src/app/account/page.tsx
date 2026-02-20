@@ -3,12 +3,13 @@ import { AccountForm } from "./_components/account-form";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getClaims } from "@/lib/supabase/rbac";
 import { getProfile } from "@/lib/data/profiles";
+import { routes } from "@/config/routes";
 
 export default async function AccountPage() {
   const claims = await getClaims();
 
   if (!claims) {
-    redirect("/login");
+    redirect(routes.auth.login);
   }
   // 2. Get Profile Data
   const profile = await getProfile(claims.sub);

@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { routes } from "@/config/routes";
 
 export default function Page() {
   return (
@@ -22,7 +23,7 @@ export default function Page() {
             <CardContent>
               <div className="mt-4 text-center text-sm">
                 Click to return{" "}
-                <Link href="/" className="underline underline-offset-4">
+                <Link href={routes.home} className="underline underline-offset-4">
                   home
                 </Link>
               </div>

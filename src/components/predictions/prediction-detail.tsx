@@ -19,11 +19,8 @@ import {
 import Link from "next/link";
 import { Suspense } from "react";
 import { EditPredictionDetailsButton } from "@/app/gurus/[slug]/predictions/[id]/edit/_components/edit-prediction-details-button";
+import { routes } from "@/config/routes";
 
-function getGuruSlug(prediction: PredictionByIdWithRelations) {
-  const guruSlug = prediction.gurus?.slug;
-  return guruSlug ? `/gurus/${guruSlug}` : `#`;
-}
 
 export function PredictionDetail({
   prediction,
@@ -73,7 +70,7 @@ export function PredictionDetail({
 
           <span className="text-sm text-muted-foreground">
             Prediction by{" "}
-            <Link href={getGuruSlug(prediction)} scroll={false}>
+            <Link href={routes.gurus.detail(prediction.gurus?.slug || '')} scroll={false}>
               <span className="font-medium text-foreground">{guru?.name}</span>
             </Link>
           </span>

@@ -2,14 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { SidebarContent } from "@/components/layout/sidebar";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Suspense } from "react";
 import { AuthButton, AuthButtonSkeleton } from "@/components/auth/auth-button";
 import { Toaster } from "@/components/ui/sonner";

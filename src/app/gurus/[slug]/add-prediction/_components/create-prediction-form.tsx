@@ -25,6 +25,8 @@ import { SourceManager } from "@/components/predictions/source-manager";
 import { format } from "date-fns";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
 import { Category } from "@/lib/definitions/category";
+import { routes } from "@/config/routes";
+import Link from "next/link";
 
 interface CreatePredictionFormProps {
   guruId: string;
@@ -208,7 +210,7 @@ export function CreatePredictionForm({
 
           <div className="flex justify-end gap-4 mt-6">
             <Button variant="outline" asChild disabled={isPending}>
-              <a href={`/gurus/${guruSlug}`}>Cancel</a>
+              <Link href={routes.gurus.detail(guruSlug)}>Cancel</Link>
             </Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "Saving..." : "Create Prediction"}

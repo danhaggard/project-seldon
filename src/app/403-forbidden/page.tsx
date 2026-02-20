@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert, ChevronLeft, Lock, Home } from "lucide-react";
+import { routes } from "@/config/routes";
 
 export default function ForbiddenPage() {
   return (
@@ -29,13 +30,13 @@ export default function ForbiddenPage() {
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button variant="default" asChild>
-          <Link href="/">
+          <Link href={routes.home}>
             <Home className="mr-2 h-4 w-4" />
             Return Home
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/gurus">
+          <Link href={routes.gurus.index}>
             <ChevronLeft className="mr-2 h-4 w-4" />
             Back to Gurus
           </Link>

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { routes } from "@/config/routes";
 
 const CommonGuruSchema = {
   bio: z.string().min(1, "Bio is required"),
@@ -122,8 +123,8 @@ export async function updateGuru(
   }
 
   // 5. Revalidate & Redirect
-  revalidatePath(`/gurus/${validatedFields.data.slug}`);
-  redirect(`/gurus/${validatedFields.data.slug}?status=updated`);
+  revalidatePath(routes.gurus.detail(validatedFields.data.slug));
+  redirect(`${routes.gurus.detail(validatedFields.data.slug)}?status=updated`);
 }
 
 const CreateGuruSchema = z.object({
@@ -230,6 +231,6 @@ export async function createGuru(
   }
 
   // 5. Revalidate & Redirect
-  revalidatePath("/gurus");
-  redirect(`/gurus/${generatedSlug}?status=created`);
+  revalidatePath(routes.gurus.index);
+  redirect(`${routes.gurus.detail(generatedSlug)}?status=created`);
 }

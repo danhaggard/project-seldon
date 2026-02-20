@@ -14,6 +14,7 @@ import {
   FormError,
   FormAlert,
 } from "@/components/layout/form-card";
+import { routes } from "@/config/routes";
 
 export function LoginForm({
   className,
@@ -31,7 +32,7 @@ export function LoginForm({
             <div className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
-                href="/auth/sign-up"
+                href={routes.auth.signUp}
                 className="underline underline-offset-4 hover:text-primary"
               >
                 Sign up
@@ -63,7 +64,7 @@ export function LoginForm({
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <Link
-                  href="/auth/forgot-password"
+                  href={routes.auth.forgotPassword}
                   className="ml-auto inline-block text-sm underline-offset-4 hover:text-primary"
                 >
                   Forgot your password?

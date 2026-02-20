@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { getGuruBySlug } from "@/lib/data/gurus";
+import { routes } from "@/config/routes";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -13,7 +14,7 @@ export default async function EditGuruPage({ params }: PageProps) {
   const claims = await getClaims();
 
   if (!claims) {
-    redirect("/login");
+    redirect(routes.auth.login);
   }
 
   const guru = await getGuruBySlug(slug);
@@ -29,7 +30,7 @@ export default async function EditGuruPage({ params }: PageProps) {
       );
 
   if (!isPermitted) {
-    redirect("/403-forbidden");
+    redirect(routes.forbidden);
   }
 
   return (

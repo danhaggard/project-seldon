@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FileQuestion } from "lucide-react";
+import { routes } from "@/config/routes";
 
 export default function GuruNotFound() {
   return (
@@ -16,7 +17,7 @@ export default function GuruNotFound() {
         </p>
       </div>
       <Button asChild className="mt-4">
-        <Link href="/gurus">Browse All Gurus</Link>
+        <Link href={routes.gurus.index}>Browse All Gurus</Link>
       </Button>
     </div>
   );

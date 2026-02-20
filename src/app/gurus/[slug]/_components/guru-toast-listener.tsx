@@ -3,11 +3,12 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
+import { StaticAppRoute } from "@/config/routes";
 
 export function GuruToastListener() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
+  const pathname = usePathname() as StaticAppRoute;
 
   useEffect(() => {
     // Check if the specific param exists

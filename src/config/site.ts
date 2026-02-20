@@ -5,10 +5,11 @@ import {
   PermissionBase,
 } from "@/lib/definitions/rbac";
 import { Home, Users, ShieldCheck, CircleUser, LucideIcon } from "lucide-react";
+import { routes, StaticAppRoute } from "@/config/routes";
 
 export type NavItem = {
   title: string;
-  href: string;
+  href: StaticAppRoute;
   icon: LucideIcon;
   requireAuth?: boolean;
   requiredPermission?: AppPermission;
@@ -31,24 +32,24 @@ export const siteConfig: SiteConfig = {
   nav: [
     {
       title: "Home",
-      href: "/",
+      href: routes.home,
       icon: Home,
     },
     {
       title: "Gurus",
-      href: "/gurus",
+      href: routes.gurus.index,
       icon: Users,
     },
     {
       title: "Admin Panel",
-      href: "/admin",
+      href: routes.admin,
       icon: ShieldCheck,
-      requireAuth: true,
+      requireAuth: true,  
       requiredPermission: APP_PERMISSION.USERS_MANAGE, // Clear, explicit intent
     },
     {
       title: "Account",
-      href: "/account",
+      href: routes.account,
       icon: CircleUser,
       requireAuth: true, // Just needs a logged-in user
     },
@@ -59,7 +60,7 @@ export const siteConfig: SiteConfig = {
   },
 
   routePermissions: {
-    "/admin": APP_PERMISSION.USERS_MANAGE,
+    [routes.admin]: APP_PERMISSION.USERS_MANAGE,
     // If you add a global categories page later:
     // "/categories/manage": APP_PERMISSION.CATEGORIES_MANAGE,
   },
@@ -67,7 +68,10 @@ export const siteConfig: SiteConfig = {
   // DYNAMIC RESOURCE ROUTES (Wildcards)
   // The middleware will verify the user has AT LEAST the base permission (e.g. .own or .any)
   dynamicRoutePermissions: {
-    "/gurus/*/edit": PERMISSION_BASE.GURUS_UPDATE,
-    "/gurus/*/predictions/*/edit": PERMISSION_BASE.PREDICTIONS_UPDATE,
+// Generates: "/gurus/*/edit"
+    [routes.gurus.edit("*")]: PERMISSION_BASE.GURUS_UPDATE,
+    
+    // Generates: "/gurus/*/predictions/*/edit"
+    [routes.gurus.predictionEdit("*", "*")]: PERMISSION_BASE.PREDICTIONS_UPDATE,
   } as Record<string, PermissionBase>,
 };

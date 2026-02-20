@@ -2,12 +2,13 @@ import { CreateGuruForm } from "./_components/create-guru-form";
 import { redirect } from "next/navigation";
 import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { APP_PERMISSION } from "@/lib/definitions/rbac";
+import { routes } from "@/config/routes";
 
 export default async function CreateGuruPage() {
   const claims = await getClaims();
 
   if (!claims) {
-    redirect("/login");
+    redirect(routes.auth.login);
   }
 
   // Verify the user has the global create capability
@@ -17,7 +18,7 @@ export default async function CreateGuruPage() {
   );
 
   if (!isPermitted) {
-    redirect("/403-forbidden");
+    redirect(routes.forbidden);
   }
 
   return (
