@@ -42,15 +42,20 @@ See [spacing-tailwind.md](./rules/spacing-tailwind.md) for:
 - Handling padding vs. margin correctly to prevent container collapse.
 
 See [spacing-agnostic-components.md](./rules/spacing-agnostic-components.md) for:
-- The "Agnostic Component" rule: Why UI components must never dictate their own outer margins (`mt-*`, `mb-*`, `my-*`).
-- Ensuring components are 100% flush to their bounding boxes for absolute reusability.
+- The "Agnostic Component" rule: Why reusable UI components must never dictate their own outer margins (`mt-*`, `mb-*`, `my-*`).
+- Understanding Padding vs. Margin: Why pushing inward (padding) is safe, but pushing outward (margin) breaks layouts.
+- Distinguishing between Layout Components (which *own* the space and can dictate structural padding) and UI Components (which *live* in the space and must remain flush).
+- Avoiding the "Invisible Margin" effect: Why you shouldn't hijack opinionated components (like `<Card>`) just for their DOM structure.
 
 ### 2. Layout & Grid (HIGH)
 
 See [layout-primitives.md](./rules/layout-primitives.md) for:
 - Moving away from noisy, inline Tailwind layout classes on standard HTML elements (e.g., `<article className="...">`).
-- Using and extending semantic layout primitives like `<PageContainer>`, `<Stack>`, and `<Row>`.
+- Using and extending polymorphic layout primitives (e.g., `<PageStack as="article">`) to enforce macro-rhythm while respecting semantic HTML.
+- Symmetrical Column Ownership: Why parent grid/flex containers must own the structural constraints (like `sticky`, `top-`, or `padding`) of their cells, rather than passing them down to child components or slots.
+- The "Component Abuse" Rule: Avoiding the "Invisible Margin" effect by not hijacking visually opinionated components (like `<Card>`) purely for their DOM structure.
 - Self-documenting page structures for easier visual scanning.
+
 
 See [layout-grid-breakpoints.md](./rules/layout-grid-breakpoints.md) for:
 - Seldon's specific responsive breakpoints (`sm`, `md`, `lg`, `xl`).

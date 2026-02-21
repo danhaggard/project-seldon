@@ -5,6 +5,7 @@ import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { getCategories } from "@/lib/data/categories";
 import { routes } from "@/config/routes";
+import { PageStack } from "@/components/layout/page-stack";
 
 interface PageProps {
   params: Promise<{ id: string; slug: string }>;
@@ -38,12 +39,14 @@ export default async function EditPredictionPage({ params }: PageProps) {
   const categories = await getCategories();
 
   return (
-    <div className="container">
-      <EditPredictionForm
-        prediction={prediction}
-        categories={categories || []}
-        guruSlug={slug}
-      />
-    </div>
+    <PageStack>
+      <div className="max-w-2xl">
+        <EditPredictionForm
+          prediction={prediction}
+          categories={categories || []}
+          guruSlug={slug}
+        />
+      </div>
+    </PageStack>
   );
 }

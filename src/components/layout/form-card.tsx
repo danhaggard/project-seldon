@@ -85,7 +85,11 @@ export function FormError({
   const errorText = Array.isArray(errors) ? errors[0] : errors;
 
   return (
-    <p aria-live="polite" id={id} className={cn("text-sm text-red-500", className)}>
+    <p
+      aria-live="polite"
+      id={id}
+      className={cn("text-sm text-red-500", className)}
+    >
       {errorText}
     </p>
   );
@@ -121,16 +125,36 @@ export function FormAlert({
   if (!message) return null;
 
   return (
-    <div 
+    <div
       className={cn(
-        "text-sm font-medium", 
+        "text-sm font-medium",
         type === "success" ? "text-green-600" : "text-red-500",
-        className
-      )} 
+        className,
+      )}
       role={type === "success" ? "status" : "alert"}
       aria-live={type === "success" ? "polite" : "assertive"}
     >
       {message}
     </div>
+  );
+}
+
+// 7. A header for full-page forms
+export function FormHeader({
+  title,
+  description,
+  className,
+}: {
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <header className={cn("flex flex-col gap-1", className)}>
+      <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+      {description && (
+        <p className="text-muted-foreground text-sm">{description}</p>
+      )}
+    </header>
   );
 }
