@@ -5,6 +5,7 @@ import { APP_PERMISSION } from "@/lib/definitions/rbac";
 import { getCategories } from "@/lib/data/categories";
 import { getGuruBySlug } from "@/lib/data/gurus";
 import { routes } from "@/config/routes";
+import { PageStack } from "@/components/layout/page-stack";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -35,13 +36,13 @@ export default async function CreatePredictionPage({ params }: PageProps) {
   const categories = await getCategories();
 
   return (
-    <div className="container">
+    <PageStack>
       <CreatePredictionForm
         guruId={guru.id}
         guruSlug={slug}
         guruName={guru.name}
         categories={categories || []}
       />
-    </div>
+    </PageStack>
   );
 }

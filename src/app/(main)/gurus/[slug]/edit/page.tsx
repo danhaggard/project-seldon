@@ -4,6 +4,7 @@ import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { PERMISSION_BASE } from "@/lib/definitions/rbac";
 import { getGuruBySlug } from "@/lib/data/gurus";
 import { routes } from "@/config/routes";
+import { PageStack } from "@/components/layout/page-stack";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,8 +35,8 @@ export default async function EditGuruPage({ params }: PageProps) {
   }
 
   return (
-    <div className="container">
+    <PageStack>
       <EditGuruForm guru={guru} />
-    </div>
+    </PageStack>
   );
 }

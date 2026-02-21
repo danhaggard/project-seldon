@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "tsc": "tsc --noEmit",
     "db-push": "pnpm supabase db push",
     "db-reset": "pnpm supabase db reset",
     "db-up": "pnpm supabase migration up",
