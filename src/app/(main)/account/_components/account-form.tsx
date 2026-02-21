@@ -8,13 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormAlert,
   FormFieldDescription,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
 
 interface ProfileData {
   full_name: string | null;
@@ -96,9 +96,9 @@ export function AccountForm({ profile }: { profile: ProfileData }) {
           </FormGroup>
 
           {/* Success / Error Message */}
-          <FormAlert 
-            message={state?.message} 
-            type={state?.success ? "success" : "error"} 
+          <FormAlert
+            message={state?.message}
+            type={state?.success ? "success" : "error"}
           />
 
           {/* Submit Button */}

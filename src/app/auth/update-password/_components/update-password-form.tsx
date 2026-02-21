@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormAlert,
   FormError,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
 
 export function UpdatePasswordForm({
   className,
@@ -43,7 +43,11 @@ export function UpdatePasswordForm({
                 aria-describedby="passwordError"
               />
               {state?.errors?.password && (
-                <div id="passwordError" aria-live="polite" className="text-sm text-red-500">
+                <div
+                  id="passwordError"
+                  aria-live="polite"
+                  className="text-sm text-red-500"
+                >
                   <ul className="list-disc list-inside">
                     {state.errors.password.map((err) => (
                       <li key={err}>{err}</li>
@@ -63,11 +67,16 @@ export function UpdatePasswordForm({
                 placeholder="Confirm new password"
                 required
                 autoComplete="new-password"
-                className={cn(state?.errors?.repeatPassword && "border-red-500")}
+                className={cn(
+                  state?.errors?.repeatPassword && "border-red-500",
+                )}
                 aria-invalid={!!state?.errors?.repeatPassword}
                 aria-describedby="repeatPasswordError"
               />
-              <FormError id="repeatPasswordError" errors={state?.errors?.repeatPassword} />
+              <FormError
+                id="repeatPasswordError"
+                errors={state?.errors?.repeatPassword}
+              />
             </FormGroup>
 
             {/* Global Error */}

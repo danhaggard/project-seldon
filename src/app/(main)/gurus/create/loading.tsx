@@ -1,8 +1,6 @@
-import {
-  FormCard,
-  FormContent,
-  FormGroup,
-} from "@/components/layout/form-card";
+import { FormContent, FormGroup } from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreateGuruLoading() {
@@ -12,7 +10,12 @@ export default function CreateGuruLoading() {
         <FormCard
           className="border-none py-0 shadow-none"
           title={<h1>Create a Guru</h1>}
-          description={<p>Add a new individual to the database to begin tracking their predictions.</p>}
+          description={
+            <p>
+              Add a new individual to the database to begin tracking their
+              predictions.
+            </p>
+          }
         >
           <FormContent>
             {Array.from({ length: 5 }).map((_, i) => (

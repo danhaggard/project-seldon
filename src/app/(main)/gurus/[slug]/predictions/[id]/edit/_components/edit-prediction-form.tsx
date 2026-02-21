@@ -20,7 +20,8 @@ import {
   FormError,
   FormAlert,
   FormHeader,
-} from "@/components/layout/form-card";
+  Form,
+} from "@/components/layout/form";
 import { format } from "date-fns";
 import { SourceManager } from "../../../../../../../../components/predictions/source-manager";
 import { useState } from "react";
@@ -60,11 +61,7 @@ export function EditPredictionForm({
   );
 
   return (
-    <form
-      action={action}
-      aria-busy={isPending}
-      className="flex flex-col gap-8 w-full"
-    >
+    <Form action={action} aria-busy={isPending}>
       {/* 1. Standard Page Header (Replaces CardHeader) */}
       <FormHeader
         title="Edit Prediction"
@@ -233,6 +230,6 @@ export function EditPredictionForm({
           </Button>
         </div>
       </FormContent>
-    </form>
+    </Form>
   );
 }

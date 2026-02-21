@@ -40,13 +40,11 @@ export default async function EditPredictionPage({ params }: PageProps) {
 
   return (
     <PageStack>
-      <div className="max-w-2xl">
-        <EditPredictionForm
-          prediction={prediction}
-          categories={categories || []}
-          guruSlug={slug}
-        />
-      </div>
+      <EditPredictionForm
+        prediction={prediction}
+        categories={categories || []}
+        guruSlug={slug}
+      />
     </PageStack>
   );
 }

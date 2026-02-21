@@ -1,8 +1,5 @@
-import {
-  FormCard,
-  FormContent,
-  FormGroup,
-} from "@/components/layout/form-card";
+import { FormContent, FormGroup } from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AccountLoading() {

@@ -8,13 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useActionState } from "react";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormFieldDescription,
   FormAlert,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import Link from "next/link";
 import { Guru } from "@/lib/definitions/guru";
 import { routes } from "@/config/routes";
@@ -77,12 +78,18 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 defaultValue={
                   state?.inputs?.twitter_handle || guru.twitter_handle || ""
                 }
-                className={cn("rounded-l-none", state?.errors?.twitter_handle && "border-red-500")}
+                className={cn(
+                  "rounded-l-none",
+                  state?.errors?.twitter_handle && "border-red-500",
+                )}
                 aria-describedby="twitterHandleError"
                 aria-invalid={!!state?.errors?.twitter_handle}
               />
             </div>
-            <FormError id="twitterHandleError" errors={state?.errors?.twitter_handle} />
+            <FormError
+              id="twitterHandleError"
+              errors={state?.errors?.twitter_handle}
+            />
           </FormGroup>
 
           <FormGroup>
@@ -97,12 +104,18 @@ export function EditGuruForm({ guru }: { guru: Guru }) {
                 defaultValue={
                   state?.inputs?.youtube_channel || guru.youtube_channel || ""
                 }
-                className={cn("rounded-l-none", state?.errors?.youtube_channel && "border-red-500")}
+                className={cn(
+                  "rounded-l-none",
+                  state?.errors?.youtube_channel && "border-red-500",
+                )}
                 aria-describedby="youtubeChannelError"
                 aria-invalid={!!state?.errors?.youtube_channel}
               />
             </div>
-            <FormError id="youtubeChannelError" errors={state?.errors?.youtube_channel} />
+            <FormError
+              id="youtubeChannelError"
+              errors={state?.errors?.youtube_channel}
+            />
           </FormGroup>
 
           <FormGroup>

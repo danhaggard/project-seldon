@@ -15,12 +15,13 @@ import {
 } from "@/components/ui/select";
 import { useActionState, useState } from "react";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormAlert,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import { SourceManager } from "@/components/predictions/source-manager";
 import { format } from "date-fns";
 import { PredictionByIdWithSources } from "@/lib/data/predictions";
@@ -109,7 +110,10 @@ export function CreatePredictionForm({
                 ))}
               </SelectContent>
             </Select>
-            <FormError id="categoryIdError" errors={state?.errors?.category_id} />
+            <FormError
+              id="categoryIdError"
+              errors={state?.errors?.category_id}
+            />
           </FormGroup>
 
           <div className="grid grid-cols-2 gap-4">
@@ -121,11 +125,16 @@ export function CreatePredictionForm({
                 type="date"
                 defaultValue={state?.inputs?.prediction_date || todayDate}
                 required
-                className={cn(state?.errors?.prediction_date && "border-red-500")}
+                className={cn(
+                  state?.errors?.prediction_date && "border-red-500",
+                )}
                 aria-invalid={!!state?.errors?.prediction_date}
                 aria-describedby="predictionDateError"
               />
-              <FormError id="predictionDateError" errors={state?.errors?.prediction_date} />
+              <FormError
+                id="predictionDateError"
+                errors={state?.errors?.prediction_date}
+              />
             </FormGroup>
 
             <FormGroup>
@@ -135,11 +144,16 @@ export function CreatePredictionForm({
                 name="resolution_window_end"
                 type="date"
                 defaultValue={state?.inputs?.resolution_window_end || ""}
-                className={cn(state?.errors?.resolution_window_end && "border-red-500")}
+                className={cn(
+                  state?.errors?.resolution_window_end && "border-red-500",
+                )}
                 aria-invalid={!!state?.errors?.resolution_window_end}
                 aria-describedby="resolutionWindowEndError"
               />
-              <FormError id="resolutionWindowEndError" errors={state?.errors?.resolution_window_end} />
+              <FormError
+                id="resolutionWindowEndError"
+                errors={state?.errors?.resolution_window_end}
+              />
             </FormGroup>
           </div>
 
@@ -180,11 +194,16 @@ export function CreatePredictionForm({
                 max="100"
                 placeholder="e.g. 90"
                 defaultValue={state?.inputs?.confidence_level || ""}
-                className={cn(state?.errors?.confidence_level && "border-red-500")}
+                className={cn(
+                  state?.errors?.confidence_level && "border-red-500",
+                )}
                 aria-invalid={!!state?.errors?.confidence_level}
                 aria-describedby="confidenceLevelError"
               />
-              <FormError id="confidenceLevelError" errors={state?.errors?.confidence_level} />
+              <FormError
+                id="confidenceLevelError"
+                errors={state?.errors?.confidence_level}
+              />
             </FormGroup>
           </div>
 
@@ -200,7 +219,10 @@ export function CreatePredictionForm({
               aria-invalid={!!state?.errors?.description}
               aria-describedby="descriptionError"
             />
-            <FormError id="descriptionError" errors={state?.errors?.description} />
+            <FormError
+              id="descriptionError"
+              errors={state?.errors?.description}
+            />
           </FormGroup>
 
           {/* Mount the SourceManager with an empty array */}
