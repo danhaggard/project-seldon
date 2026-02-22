@@ -4,6 +4,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getClaims } from "@/lib/supabase/rbac";
 import { getProfile } from "@/lib/data/profiles";
 import { routes } from "@/config/routes";
+import { PageStack } from "@/components/layout/page-stack";
 
 export default async function AccountPage() {
   const claims = await getClaims();
@@ -29,12 +30,12 @@ export default async function AccountPage() {
   };
 
   return (
-    <div className="container">
+    <PageStack>
       <AccountForm profile={combinedData} />
       <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
         <p>Theme Toggle</p>
         <ThemeSwitcher />
       </footer>
-    </div>
+    </PageStack>
   );
 }

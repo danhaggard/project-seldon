@@ -7,6 +7,7 @@ import { GuruToastListener } from "./_components/guru-toast-listener";
 import { DiscussionTab } from "./_components/discussion/discussion-tab";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { PageStack } from "@/components/layout/page-stack";
 
 /* --- Skeletons --- */
 function HeaderSkeleton() {
@@ -15,7 +16,7 @@ function HeaderSkeleton() {
 
 function FeedSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-6">
       <Skeleton className="w-full h-12" /> {/* Tabs */}
       <Skeleton className="w-full h-32" /> {/* Card 1 */}
       <Skeleton className="w-full h-32" /> {/* Card 2 */}
@@ -45,7 +46,7 @@ export default async function GuruDetailPage({
   const isPendingTab = tab === "pending";
 
   return (
-    <article className="container space-y-4">
+    <PageStack as="article">
       <GuruToastListener />
       {/* 1. Header Section */}
       {/* If this fails, we show a red error box where the header should be */}
@@ -56,7 +57,7 @@ export default async function GuruDetailPage({
 
       {/* 2. Content Tabs */}
       <div className="border-b flex flex-row overflow-x-auto no-scrollbar justify-between">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+        <nav className="-mb-px flex gap-8" aria-label="Tabs">
           <Link
             href={`?tab=pending`}
             scroll={false}
@@ -109,6 +110,6 @@ export default async function GuruDetailPage({
           )}
         </Suspense>
       </SectionErrorBoundary>
-    </article>
+    </PageStack>
   );
 }

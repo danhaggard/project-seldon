@@ -6,7 +6,7 @@ import { getClaims } from "@/lib/supabase/rbac";
 export async function SidebarContent() {
   const claims = await getClaims();
   return (
-    <nav className="flex flex-col gap-2 pr-4">
+    <nav className="flex flex-col gap-2">
       {siteConfig.nav.map((item) => {
         const Icon = item.icon;
 

@@ -9,12 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormAlert,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import { routes } from "@/config/routes";
 
 export function LoginForm({

@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormAlert,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import { routes } from "@/config/routes";
 
 export function ForgotPasswordForm({
@@ -28,7 +29,9 @@ export function ForgotPasswordForm({
         /* --- 1. Success View --- */
         <FormCard
           title={<h1>Check Your Email</h1>}
-          description={<p>Password reset instructions have been sent to your email.</p>}
+          description={
+            <p>Password reset instructions have been sent to your email.</p>
+          }
         >
           <div className="flex flex-col gap-4">
             <p className="text-sm text-muted-foreground">
@@ -45,7 +48,12 @@ export function ForgotPasswordForm({
         <form action={action} aria-busy={isPending}>
           <FormCard
             title={<h1>Reset Your Password</h1>}
-            description={<p>Type in your email and we&apos;ll send you a link to reset your password</p>}
+            description={
+              <p>
+                Type in your email and we&apos;ll send you a link to reset your
+                password
+              </p>
+            }
             footer={
               <div className="text-center text-sm text-muted-foreground">
                 Remember your password?{" "}

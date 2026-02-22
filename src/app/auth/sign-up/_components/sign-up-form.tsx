@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import {
-  FormCard,
   FormContent,
   FormGroup,
   FormError,
   FormAlert,
   FormFieldDescription,
-} from "@/components/layout/form-card";
+} from "@/components/layout/form";
+import { FormCard } from "@/components/layout/form-card";
+
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { routes } from "@/config/routes";
 

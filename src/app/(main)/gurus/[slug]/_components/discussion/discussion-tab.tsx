@@ -49,7 +49,7 @@ export async function DiscussionTab({ slug }: DiscussionTabProps) {
   }
 
   return (
-    <div className="mx-auto pb-24">
+    <div className="pb-24">
       <CommentTree
         comments={commentsWithPermissions}
         guruId={guruId}

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { checkPermission, getClaims } from "@/lib/supabase/rbac";
 import { APP_PERMISSION } from "@/lib/definitions/rbac";
 import { routes } from "@/config/routes";
+import { PageStack } from "@/components/layout/page-stack";
 
 export default async function CreateGuruPage() {
   const claims = await getClaims();
@@ -22,8 +23,8 @@ export default async function CreateGuruPage() {
   }
 
   return (
-    <div className="container">
+    <PageStack>
       <CreateGuruForm />
-    </div>
+    </PageStack>
   );
 }
